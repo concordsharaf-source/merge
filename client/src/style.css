@@ -1,12 +1,12 @@
-/* دفتر التاجر الهادئ: حداثة وظيفية دافئة؛ العاجي، أخضر السجل، وتسلسل تشغيلي واضح. */
-/* دفتر التاجر الهادئ: RTL عملي، حقول عربية واضحة، وإطار مسح يدعم الهاتف دون توسع أفقي. */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap");
+/* هوية حسابي البصرية الجديدة (مرجع التصميم: Google Stitch — Material-3): أخضر سجلي عميق، أسطح فاتحة مزرقّة، وتشغيل عربي واضح. */
+/* RTL عملي، حقول عربية واضحة، وإطار مسح يدعم الهاتف دون توسع أفقي. */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&display=swap");
 
-:root { --ink:#17342d; --muted:#6a776f; --canvas:#f4f3ec; --paper:#fffefa; --line:#e4e5dc; --green:#1f6b59; --green-deep:#174c3f; --green-pale:#e7f1eb; --gold:#c59a55; --gold-pale:#f8f0df; --danger:#b84845; --danger-pale:#fae9e6; --shadow:0 15px 40px rgba(24, 52, 43, .08); --shadow-soft:0 5px 18px rgba(24, 52, 43, .06); --radius:18px; --ease-out:cubic-bezier(.23,1,.32,1); font-family:"Cairo", sans-serif; color:var(--ink); background:var(--canvas); }
+:root { --ink:#111c2d; --muted:#44534c; --canvas:#f9f9ff; --paper:#ffffff; --line:#dbe4f4; --green:#006346; --green-deep:#014d38; --green-pale:#d7f6e7; --gold:#a85a00; --gold-pale:#ffefe6; --danger:#ba1a1a; --danger-pale:#ffdad6; --shadow:0 15px 40px rgba(17, 28, 45, .08); --shadow-soft:0 5px 18px rgba(17, 28, 45, .06); --radius:16px; --ease-out:cubic-bezier(.23,1,.32,1); font-family:"Noto Kufi Arabic","Cairo", sans-serif; color:var(--ink); background:var(--canvas); }
 * { box-sizing:border-box; }
 html { background:var(--canvas); }
 html, body, #app { width:100%; max-width:100%; overflow-x:hidden; }
-body { margin:0; min-width:320px; min-height:100vh; direction:rtl; background:radial-gradient(circle at 90% 0%, rgba(197,154,85,.10), transparent 28rem), var(--canvas); }
+body { margin:0; min-width:320px; min-height:100vh; direction:rtl; background:radial-gradient(circle at 90% 0%, rgba(8,126,91,.08), transparent 28rem), var(--canvas); }
 button, input, select, textarea { font:inherit; }
 button { border:0; }
 button:not(:disabled) { cursor:pointer; }
@@ -257,8 +257,8 @@ tbody tr:nth-child(even) td:first-child,.inventory-list .inventory-row:nth-child
 
 /* الوضع الداكن: يحافظ على هوية دفتر التاجر الهادئ مع تباين عالٍ للعمليات اليومية. */
 .topbar__actions { display:flex; align-items:center; gap:8px; flex:0 0 auto; }.theme-toggle { border:1px solid rgba(31,107,89,.18); background:rgba(255,254,250,.74); }.button--danger { color:#fff; background:var(--danger); box-shadow:0 7px 15px rgba(184,72,69,.18); }
-:root[data-theme="dark"] { --ink:#f2faf5; --muted:#c4d4cb; --canvas:#101d18; --paper:#1a2d26; --line:#58756a; --green:#7bd8aa; --green-deep:#c9f7dc; --green-pale:#244b3d; --gold:#ffd07d; --gold-pale:#4d3d20; --danger:#ff938c; --danger-pale:#572d2c; --shadow:0 15px 40px rgba(0,0,0,.36); --shadow-soft:0 5px 18px rgba(0,0,0,.28); color-scheme:dark; }
-html[data-theme="dark"], html[data-theme="dark"] body { background:radial-gradient(circle at 90% 0%, rgba(223,185,111,.09), transparent 28rem), var(--canvas); }
+:root[data-theme="dark"] { --ink:#e6edf6; --muted:#9db0c5; --canvas:#0f172a; --paper:#1e293b; --line:#33415c; --green:#78d9b0; --green-deep:#c7ffe3; --green-pale:#123629; --gold:#ffb77d; --gold-pale:#3a2a14; --danger:#ffb4ab; --danger-pale:#4c2320; --shadow:0 15px 40px rgba(0,0,0,.36); --shadow-soft:0 5px 18px rgba(0,0,0,.28); color-scheme:dark; }
+html[data-theme="dark"], html[data-theme="dark"] body { background:radial-gradient(circle at 90% 0%, rgba(120,217,176,.07), transparent 28rem), var(--canvas); }
 [data-theme="dark"] input,[data-theme="dark"] select,[data-theme="dark"] textarea,[data-theme="dark"] .search-field,[data-theme="dark"] .purchase-product-results button,[data-theme="dark"] .purchase-line,[data-theme="dark"] .quantity-control { color:var(--ink); background:#1a2b25; border-color:var(--line); }
 [data-theme="dark"] .checkbox-field { color:#f2faf5; background:#1a2b25; border-color:#6d9585; }
 [data-theme="dark"] .checkbox-field span { color:#f2faf5; }
@@ -1781,130 +1781,54 @@ html.is-sales-sheet-open .toolbar--sales { position: static; }
 .cart-sheet-close { color: #fff4bd; background: #174b40; border-color: #d6ad50; }
 .cart-sheet-close:hover { color: #14372f; background: #f3cf70; }
 [data-theme="dark"] .cart-sheet-close:hover { color: #123d38; background: #f3cf70; }
-/* تحديث ألوان محدود — بدون تغيير التخطيط أو الأحجام أو المكوّنات. */
-:root {
-  --canvas: #f9f9ff;
-  --paper: #ffffff;
-  --line: #d8e3fb;
-  --ink: #111c2d;
-  --muted: #64748b;
-  --green: #087e5b;
-  --green-deep: #006346;
-  --green-pale: #ecfdf5;
-  --gold: #a85a00;
-  --gold-pale: #fff7ed;
-  --danger: #ba1a1a;
-  --danger-pale: #fff1f2;
-  --shadow: 0 15px 40px rgba(30, 41, 59, .08);
-  --shadow-soft: 0 5px 18px rgba(30, 41, 59, .06);
-}
-body { background: var(--canvas); color: var(--ink); }
-:root[data-theme="dark"] {
-  --canvas: #0b1324;
-  --paper: #111c2d;
-  --line: #334155;
-  --ink: #f8fafc;
-  --muted: #94a3b8;
-  --green: #34d399;
-  --green-deep: #94f6cb;
-  --green-pale: #064e3b;
-  --gold: #fbbf24;
-  --gold-pale: #451a03;
-  --danger: #f87171;
-  --danger-pale: #450a0a;
-}
-/* Hesabi ERP redesign — complete visual layer; application logic remains untouched. */
-:root {
-  --canvas:#f8f8ff; --paper:#fff; --paper-soft:#f0f3ff; --paper-high:#e7eeff;
-  --line:#d8e3fb; --ink:#111c2d; --muted:#64748b; --green:#087e5b; --green-deep:#006346;
-  --green-pale:#ecfdf5; --gold:#a85a00; --gold-pale:#fff1df; --danger:#ba1a1a; --danger-pale:#ffebe8;
-  --blue:#1e667f; --shadow:0 12px 30px rgba(30,41,59,.07); --shadow-soft:0 4px 14px rgba(30,41,59,.06);
-}
-html,body,#app { min-width:320px; }
-body { direction:rtl; background:var(--canvas); color:var(--ink); font-family:"Cairo","Noto Kufi Arabic","Plus Jakarta Sans",sans-serif; }
-.app-shell { direction:rtl; display:grid; grid-template-columns:276px minmax(0,1fr); min-height:100vh; background:var(--canvas); }
-.sidebar { display:flex; position:sticky; top:0; z-index:30; height:100vh; overflow-y:auto; flex-direction:column; gap:16px; padding:20px 16px; background:rgba(255,255,255,.96); border-left:1px solid var(--line); box-shadow:-5px 0 22px rgba(30,41,59,.04); }
-.brand { display:flex; align-items:center; gap:10px; padding:4px 8px 18px; border-bottom:1px solid var(--line); }
-.brand img { width:44px; height:44px; object-fit:contain; border-radius:13px; }
-.brand strong { display:block; color:var(--green-deep); font-size:19px; font-weight:900; }
-.brand small { display:block; margin-top:3px; color:var(--muted); font-size:10px; }
-.sidebar__label { padding:0 10px; color:#6e7a73; font-size:10px; font-weight:900; }
-.sidebar nav { display:grid; gap:4px; }
-.nav-item { display:flex; align-items:center; gap:10px; min-height:42px; padding:9px 12px; width:100%; border:1px solid transparent; border-radius:10px; background:transparent; color:#334155; text-align:right; font-size:12px; font-weight:800; cursor:pointer; }
-.nav-item svg { width:18px; height:18px; flex:0 0 auto; }
-.nav-item:hover { background:var(--paper-soft); color:var(--green-deep); }
-.nav-item.is-active { background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 6px 14px rgba(8,126,91,.18); }
-.sidebar__account { margin-top:auto; padding:12px; border-radius:12px; background:var(--paper-soft); border:1px solid var(--line); }
-.sidebar__account strong { display:block; margin:6px 0 2px; font-size:12px; }
-.sidebar__footer { display:flex; align-items:center; gap:6px; padding:0 8px; color:var(--muted); font-size:9px; font-weight:700; }
-.presence-dot { width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 0 4px rgba(16,185,129,.12); }
-.bottom-nav { display:none; }
-.workspace { width:100%; max-width:1500px; min-width:0; margin:0 auto; padding:18px clamp(18px,2.5vw,36px) 60px; }
-.topbar { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin:0 0 18px; padding:6px 2px 16px; border-bottom:1px solid var(--line); }
-.topbar h1 { margin:0 0 4px; color:var(--ink); font-size:clamp(22px,2.2vw,30px); font-weight:900; letter-spacing:-.04em; }
-.topbar__description { margin:0; color:var(--muted); font-size:12px; line-height:1.8; }
-.topbar__actions { display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:7px; }
-.button { min-height:38px; border-radius:9px; font-size:11px; font-weight:800; }
-.button--primary { background:var(--green); border-color:var(--green); color:#fff; box-shadow:0 5px 12px rgba(8,126,91,.16); }
+
+/* ====== إعادة تشكيل بصرية بهوية Material-3 (مرجع التصميم: Google Stitch) — طبقة شكل فقط دون أي منطق ====== */
+body, button, input, select, textarea { font-family:"Noto Kufi Arabic","Cairo",sans-serif; }
+h1,h2,h3,strong,.button,.nav-item { letter-spacing:0; }
+.panel { background:var(--paper); border:1px solid var(--line); border-radius:20px; box-shadow:var(--shadow-soft); }
+.button { border-radius:12px; }
+.button--primary { background:var(--green); box-shadow:0 7px 16px rgba(0,99,70,.22); }
 .button--primary:hover { background:var(--green-deep); }
-.button--secondary { background:#fff; border-color:#bde9ff; color:var(--blue); }
-.button--secondary:hover { background:#effaff; }
-.panel,.metric-card,.reports-bottom-action,.inventory-row,.invoice-row,.entity-row,.account-row { border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.92); box-shadow:var(--shadow-soft); }
-.panel { overflow:hidden; }
-.panel__head { padding:15px 18px; border-bottom:1px solid var(--line); }
-.panel__head h2,.panel__head h3 { color:var(--ink); }
-.metric-grid { gap:12px; }
-.metric-card { min-height:132px; padding:15px; background:linear-gradient(145deg,#fff 0%,#f0f3ff 100%); }
-.metric-card__icon { width:40px; height:40px; border-radius:11px; background:var(--green-pale); color:var(--green-deep); }
-.metric-card__body > strong { color:var(--green-deep); font-weight:900; }
-input,select,textarea,.search-field { border-color:var(--line); background:#f8fafc; color:var(--ink); border-radius:9px; }
-input:focus,select:focus,textarea:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(8,126,91,.12); background:#fff; }
-.search-field { min-height:44px; }
-.sales-layout { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:16px; align-items:start; }
-.sales-catalog { min-width:0; }
-.toolbar--sales { padding:10px; border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:var(--shadow-soft); }
-.sale-matches { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
-.sale-product { display:flex; flex-direction:column; align-items:stretch; justify-content:space-between; min-height:190px; padding:12px; border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:var(--shadow-soft); }
-.sale-product:hover { transform:translateY(-2px); border-color:#78d9b0; box-shadow:0 10px 24px rgba(8,126,91,.13); }
-.sale-product.is-in-cart { background:var(--green-pale); border-color:#78d9b0; }
-.sale-product i { border-radius:10px; background:var(--green); color:#fff; }
-.cart-panel { position:sticky; top:14px; min-width:0; border:1px solid var(--line); border-radius:16px; background:#fff; box-shadow:var(--shadow); overflow:hidden; }
-.cart-panel__head { background:linear-gradient(135deg,var(--green),var(--green-deep)); color:#fff; border:0; }
-.cart-lines { padding:10px; background:var(--paper-soft); }
-.cart-line { border:1px solid var(--line); border-radius:10px; background:#fff; }
-.cart-total { background:#fff; border-top:1px solid var(--line); }
-.checkout-launch,.cart-total .button { min-height:54px; border-radius:13px; background:var(--green); color:#fff; font-weight:900; }
-.status--available { color:#065f46; background:#ecfdf5; border-color:#a7f3d0; }
-.status--warning { color:#92400e; background:#fffbeb; border-color:#fde68a; }
-.status--danger { color:#991b1b; background:#fef2f2; border-color:#fecaca; }
-.category-chip { border-radius:999px; background:var(--paper-soft); color:var(--ink); }
-.category-chip.is-active { background:var(--green); color:#fff; }
-.table-wrap { border:1px solid var(--line); border-radius:13px; overflow:auto; background:#fff; }
-table th { background:var(--paper-soft); color:#475569; font-size:10px; font-weight:900; }
-table td { border-color:var(--line); font-size:11px; }
-.dialog-backdrop { background:rgba(17,28,45,.38); backdrop-filter:blur(6px); }
-.dialog { border:1px solid var(--line); border-radius:18px; box-shadow:0 24px 60px rgba(15,23,42,.22); }
-@media (max-width:1200px) { .sale-matches { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-@media (max-width:900px) {
-  .app-shell { display:block; }
-  .sidebar { display:none; }
-  .workspace { padding:14px 12px 88px; }
-  .bottom-nav { position:fixed; right:10px; left:10px; bottom:9px; z-index:50; display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:3px; padding:6px; border:1px solid var(--line); border-radius:16px; background:rgba(255,255,255,.96); box-shadow:0 12px 30px rgba(15,23,42,.16); }
-  .bottom-nav .nav-item { min-height:48px; flex-direction:column; justify-content:center; gap:2px; padding:4px 2px; font-size:8px; }
-  .bottom-nav .nav-item svg { width:17px; height:17px; }
-  .topbar { flex-direction:column; gap:10px; }
-  .topbar__actions { justify-content:flex-start; }
-  .sales-layout { display:block; }
-  .cart-panel { position:static; margin-top:14px; }
+.button--secondary { color:var(--green-deep); background:var(--paper); border:1px solid var(--line); }
+.button--secondary:hover { background:var(--green-pale); border-color:transparent; }
+.icon-button:hover { background:var(--green-pale); }
+input, select, textarea { border-radius:12px; }
+input:focus, select:focus, textarea:focus { border-color:var(--green); box-shadow:0 0 0 4px rgba(0,99,70,.12); }
+.search-field { background:var(--paper); border:1px solid var(--line); border-radius:14px; }
+.search-field:focus-within { border-color:var(--green); box-shadow:0 0 0 4px rgba(0,99,70,.1); }
+.topbar h1 { font-size:26px; font-weight:800; }
+.metric-card { background:linear-gradient(140deg,#006346 0%,#087e5b 100%); border-color:rgba(148,246,201,.55); box-shadow:0 5px 0 #013626,0 12px 22px rgba(1,54,38,.24); border-radius:18px; }
+.metric-card__icon { background:rgba(1,54,38,.55); border-color:rgba(199,255,227,.4); }
+.metric-card.is-negative { background:linear-gradient(140deg,#8f1d2c,#b8203a); border-color:#ffc3ca; box-shadow:0 5px 0 #5c1220,0 12px 22px rgba(92,18,32,.3); }
+.action-panel { background:linear-gradient(150deg,#006346,#014d38); border-radius:20px; }
+.quick-actions { grid-template-columns:1fr 1fr; gap:10px; }
+.quick-actions button { flex-direction:column; align-items:center; justify-content:center; gap:8px; padding:14px 8px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.16) !important; border-radius:14px; font-size:11px; }
+.quick-actions button svg { width:20px; height:20px; color:#94f6cb; }
+.bottom-nav { height:70px; background:rgba(255,255,255,.86); backdrop-filter:blur(16px); border-top:1px solid var(--line); }
+.bottom-nav .nav-item { min-width:62px; border-radius:16px; color:var(--muted); }
+.bottom-nav .nav-item.is-active { color:var(--green-deep); background:var(--green-pale); }
+.bottom-nav .nav-item svg { width:20px; }
+.sales-scanner-fab { background:var(--green); border-radius:999px; box-shadow:0 10px 24px rgba(0,99,70,.35); }
+.entity-row__icon, .invoice-row__mark, .inventory-icon { border-radius:12px; }
+.warning-row__icon { color:var(--gold); background:var(--gold-pale); }
+.dialog, .scanner-dialog { border-radius:24px 24px 0 0; }
+.setup-sheet { border-radius:24px 24px 0 0; }
+.toast { border-radius:14px; }
+.status { border-radius:8px; }
+/* الوضع الداكن: توحيد الأسطح على لوحة Slate مع أخضر نيوني */
+[data-theme="dark"] .panel, [data-theme="dark"] .daily-ribbon, [data-theme="dark"] .dialog, [data-theme="dark"] .scanner-dialog, [data-theme="dark"] .setup-sheet, [data-theme="dark"] .sidebar, [data-theme="dark"] .sale-product, [data-theme="dark"] .no-match { background:#1e293b; border-color:#33415c; color:var(--ink); }
+[data-theme="dark"] .bottom-nav { background:rgba(15,23,42,.9); border-top-color:#33415c; }
+[data-theme="dark"] input, [data-theme="dark"] select, [data-theme="dark"] textarea, [data-theme="dark"] .search-field, [data-theme="dark"] .purchase-line, [data-theme="dark"] .purchase-product-results button, [data-theme="dark"] .quantity-control { background:#16233c; border-color:#33415c; }
+[data-theme="dark"] .button--secondary, [data-theme="dark"] .theme-toggle { background:#24344f; border-color:#3b4d6b; color:var(--green-deep); }
+[data-theme="dark"] .metric-card__icon, [data-theme="dark"] .entity-row__icon, [data-theme="dark"] .invoice-row__mark, [data-theme="dark"] .inventory-icon { color:var(--green); background:#123629; }
+[data-theme="dark"] .warning-row__icon, [data-theme="dark"] .entity-row__icon--expense, [data-theme="dark"] .invoice-row__mark--purchase { color:var(--gold); background:#3a2a14; }
+[data-theme="dark"] .bottom-nav .nav-item { color:#9db0c5; }
+[data-theme="dark"] .bottom-nav .nav-item.is-active { color:#78d9b0; background:#123629; }
+[data-theme="dark"] .account-summary>div, [data-theme="dark"] .locked-field, [data-theme="dark"] .inline-empty, [data-theme="dark"] .purchase-picker { background:#16233c; border-color:#33415c; }
+[data-theme="dark"] .credit-summary, [data-theme="dark"] .stock-before { background:#123629; border-color:#1d5c44; color:var(--green-deep); }
+[data-theme="dark"] .quantity-control>button, [data-theme="dark"] .quantity-control__button { background:#1c3a2e; color:var(--green); }
+[data-theme="dark"] .toast { background:#0b1524; border-color:#33415c; }
+@media (min-width:960px) {
+  .sidebar { background:var(--paper); border-left-color:var(--line); }
+  .sidebar .nav-item.is-active { background:linear-gradient(145deg,#006346,#014d38); border-color:#014d38; box-shadow:0 4px 0 #013626,0 9px 16px rgba(1,54,38,.25); color:#fff; }
 }
-@media (max-width:600px) {
-  .sale-matches { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-  .sale-product { min-height:160px; padding:9px; }
-}
-:root[data-theme="dark"] { --canvas:#0b1324; --paper:#111c2d; --paper-soft:#162032; --paper-high:#1e293b; --line:#334155; --ink:#f8fafc; --muted:#94a3b8; --green:#34d399; --green-deep:#94f6cb; --green-pale:#064e3b; --gold:#fbbf24; --danger:#f87171; }
-:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .bottom-nav,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .metric-card,:root[data-theme="dark"] .sale-product,:root[data-theme="dark"] .cart-panel,:root[data-theme="dark"] .table-wrap { background:var(--paper); border-color:var(--line); }
-:root[data-theme="dark"] .metric-card { background:linear-gradient(145deg,#111c2d,#162032); }
-:root[data-theme="dark"] .toolbar--sales,:root[data-theme="dark"] .cart-line,:root[data-theme="dark"] .cart-total { background:var(--paper); }
-:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] textarea,:root[data-theme="dark"] .search-field { background:#0f172a; color:var(--ink); }
-:root[data-theme="dark"] .nav-item { color:#cbd5e1; }
-:root[data-theme="dark"] .nav-item.is-active { background:#087e5b; color:#fff; }
