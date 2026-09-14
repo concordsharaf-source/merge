@@ -1,16 +1,7 @@
-/* ==========================================================================
-   Ù†Ø¸Ø§Ù… Ø­Ø³Ø§Ø¨ÙŠ (Hesabi) â€” Ù…Ù„Ù Ø§Ù„ØªÙ†Ø³ÙŠÙ‚Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø© ÙˆØ§Ù„Ø£Ø³Ø§Ø³ÙŠØ© (style.css)
-   Ù‡ÙˆÙŠØ© Ø§Ù„ØªØµÙ…ÙŠÙ…: Ø¯ÙØªØ± Ø§Ù„ØªØ§Ø¬Ø± Ø§Ù„Ù‡Ø§Ø¯Ø¦ | Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„ÙØ§ØªØ­ ÙˆØ§Ù„Ø¯Ø§ÙƒÙ† | Ø¯Ø¹Ù… Ø§Ù„Ø¬ÙˆØ§Ù„ ÙˆØ³Ø·Ø­ Ø§Ù„Ù…ÙƒØªØ¨
-   ========================================================================== */
-
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap');
 
-/* --- Ø§Ù„Ù…ØªØºÙŠØ±Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø© ÙˆÙ†Ø¸Ø§Ù… Ø§Ù„Ø£Ù„ÙˆØ§Ù† Ø§Ù„Ù…ØªÙˆØ§Ø²Ù† (Theme Tokens) --- */
 :root {
-  /* Ø§Ù„Ø®Ø·ÙˆØ· */
   --font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
-  /* Ù„ÙˆØ­Ø© Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„ÙØ§ØªØ­ (Light Theme) */
   --bg-app: #f4f6f5;
   --surface: #ffffff;
   --surface-hover: #f9fbf9;
@@ -18,7 +9,6 @@
   --surface-border: #e2e8e4;
   --surface-border-subtle: #edf1ee;
 
-  /* Ø§Ù„Ø£Ù„ÙˆØ§Ù† Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© ÙˆØ¯Ù„Ø§Ù„Ø§Øª Ø§Ù„Ø­Ø§Ù„Ø© */
   --primary: #087e5b;
   --primary-hover: #06674a;
   --primary-light: #e6f4ef;
@@ -34,7 +24,6 @@
   --info: #2b6cb0;
   --info-bg: #ebf8ff;
 
-  /* Ø§Ù„Ù†ØµÙˆØµ ÙˆØ§Ù„Ø¸Ù„Ø§Ù„ */
   --text-primary: #172a22;
   --text-secondary: #566860;
   --text-muted: #83958c;
@@ -53,13 +42,11 @@
   --transition-fast: 150ms ease;
   --transition-normal: 240ms cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Ù‚ÙŠØ§Ø³Ø§Øª ØªØ®Ø·ÙŠØ· Ø³Ø·Ø­ Ø§Ù„Ù…ÙƒØªØ¨ ÙˆØ§Ù„Ø¬ÙˆØ§Ù„ */
   --sidebar-width: 260px;
   --bottom-nav-height: 68px;
   --topbar-height: 64px;
 }
 
-/* --- Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¯Ø§ÙƒÙ† Ø¹Ø§Ù„ÙŠ Ø§Ù„ØªØ¨Ø§ÙŠÙ† ÙˆØ§Ù„Ù…Ø±ÙŠØ­ Ù„Ù„Ø¹ÙŠÙ† (Dark Theme) --- */
 [data-theme="dark"] {
   --bg-app: #0d1613;
   --surface: #14221d;
@@ -94,7 +81,6 @@
   --shadow-sheet: 0 -8px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* --- Ø¥Ø¹Ø§Ø¯Ø© Ø§Ù„Ø¶Ø¨Ø· ÙˆØ§Ù„ØªÙ‡ÙŠØ¦Ø© Ø§Ù„Ø£Ø³Ø§Ø³ÙŠØ© (Reset & Base) --- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -116,7 +102,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* --- Ø§Ù„Ù‡ÙŠÙƒÙ„ Ø§Ù„Ø¹Ø§Ù… ÙˆØ§Ù„ØªØ®Ø·ÙŠØ· Ø§Ù„Ø´Ø§Ù…Ù„ (App Shell & Layout) --- */
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -138,7 +123,6 @@ html, body {
   }
 }
 
-/* --- Ø§Ù„Ø´Ø±ÙŠØ· Ø§Ù„Ø¬Ø§Ù†Ø¨ÙŠ Ù„Ø³Ø·Ø­ Ø§Ù„Ù…ÙƒØªØ¨ (Desktop Sidebar) --- */
 .sidebar {
   display: none;
 }
@@ -251,7 +235,6 @@ html, body {
   }
 }
 
-/* --- Ø´Ø±ÙŠØ· Ø§Ù„ØªÙ†Ù‚Ù„ Ø§Ù„Ø³ÙÙ„ÙŠ Ù„Ù„Ø¬ÙˆØ§Ù„ (Mobile Bottom Nav - 9 Elements) --- */
 .bottom-nav {
   display: flex;
   align-items: center;
@@ -313,7 +296,6 @@ html, body {
   }
 }
 
-/* --- Ø´Ø±ÙŠØ· Ø§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ø¹Ù„ÙˆÙŠ (Topbar) --- */
 .topbar {
   display: flex;
   align-items: center;
@@ -358,7 +340,6 @@ html, body {
   border-radius: var(--radius-sm);
 }
 
-/* --- Ø¹Ù†Ø§ØµØ± Ø§Ù„ÙˆØ§Ø¬Ù‡Ø© ÙˆØ§Ù„Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ù…ÙˆØ­Ø¯Ø© (Buttons & Form Controls) --- */
 .button {
   display: inline-flex;
   align-items: center;
@@ -447,7 +428,6 @@ html, body {
   border-color: var(--danger);
 }
 
-/* Ø­Ù‚ÙˆÙ„ Ø§Ù„Ø¥Ø¯Ø®Ø§Ù„ */
 input, select, textarea {
   width: 100%;
   padding: 10px 14px;
@@ -484,7 +464,6 @@ input:focus, select:focus, textarea:focus {
   padding-right: 44px;
 }
 
-/* --- Ø¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„Ù…Ø¤Ø´Ø±Ø§Øª Ø§Ù„Ø±Ù‚Ù…ÙŠØ© (Metric Cards) --- */
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -547,7 +526,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--danger);
 }
 
-/* --- Ø´Ø§Ø´Ø© Ù†Ù‚Ø·Ø© Ø§Ù„Ø¨ÙŠØ¹ ÙˆØ³Ù„Ø© Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª (POS Layout & Cart Sheet) --- */
 .sales-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -606,7 +584,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--primary);
 }
 
-/* ÙˆØ±Ù‚Ø© Ø§Ù„Ø³Ù„Ø© Ø§Ù„Ø³ÙÙ„ÙŠØ© Ø§Ù„ØªÙØ§Ø¹Ù„ÙŠØ© (Cart Bottom Sheet) */
 .cart-panel {
   display: flex;
   flex-direction: column;
@@ -678,7 +655,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--primary);
 }
 
-/* --- Ø§Ù„Ù†ÙˆØ§ÙØ° Ø§Ù„Ø­ÙˆØ§Ø±ÙŠØ© Ø§Ù„Ù…Ù†Ø¨Ø«Ù‚Ø© (Modals & Dialogs) --- */
 .dialog-backdrop {
   position: fixed;
   inset: 0;
@@ -727,7 +703,6 @@ input:focus, select:focus, textarea:focus {
   font-weight: 800;
 }
 
-/* --- Ø¹Ù†Ø§ØµØ± Ø§Ù„ØªÙ†Ø¨ÙŠÙ‡ Ø§Ù„ÙÙˆØ±ÙŠ (Toasts) --- */
 .toast-host {
   position: fixed;
   top: 20px;
@@ -772,7 +747,6 @@ input:focus, select:focus, textarea:focus {
   color: var(--danger);
 }
 
-/* Ø²Ø± Ø§Ù„Ø¨ÙŠØ¹ Ø§Ù„Ø¹Ø§Ø¦Ù… Ù„Ù„Ø¬ÙˆØ§Ù„ */
 .sales-scanner-fab {
   position: fixed;
   bottom: calc(var(--bottom-nav-height) + 16px);
