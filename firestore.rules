@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ownsBackup(userId) { return request.auth != null && request.auth.uid == userId; }
+    function signedIn() { return request.auth != null; }
+    function member(storeId) {
+      return signedIn() && exists(/databases/$(database)/documents/stores/$(storeId)/members/$(request.auth.uid)) && get(/databases/$(database)/documents/stores/$(storeId)/members/$(request.auth.uid)).data.status == 'active';
+    }
+    function admin(storeId) {
+      return member(storeId)
+        && get(/databases/$(database)/documents/stores/$(storeId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function ownsStore(storeId) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/stores/$(storeId))
+        && get(/databases/$(database)/documents/stores/$(storeId)).data.ownerUid == request.auth.uid;
+    }
+
+    match /backupOwners/{userId} {
+      allow read, write: if ownsBackup(userId);
+      match /backups/{backupId} {
+        allow read, write: if ownsBackup(userId);
+        match /chunks/{chunkId} { allow read, write: if ownsBackup(userId); }
+      }
+    }
+
+    match /storeDirectory/{emailKey} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+    }
+
+        match /stores/{storeId} {
+      allow read: if member(storeId);
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid;
+      allow update: if admin(storeId) || ownsStore(storeId);
+      match /members/{uid} {
+        allow read: if (signedIn() && request.auth.uid == uid) || admin(storeId);
+        allow create: if admin(storeId) || (signedIn() && request.auth.uid == uid && request.resource.data.role == 'admin' && request.resource.data.status == 'active') || (signedIn() && request.auth.uid == uid && request.resource.data.status == 'active' && request.resource.data.storeId == storeId && request.resource.data.pairingCode is string && exists(/databases/$(database)/documents/stores/$(storeId)/pairings/$(request.resource.data.pairingCode)) && get(/databases/$(database)/documents/stores/$(storeId)/pairings/$(request.resource.data.pairingCode)).data.usedAt == null && get(/databases/$(database)/documents/stores/$(storeId)/pairings/$(request.resource.data.pairingCode)).data.accountId == request.resource.data.accountId);
+        allow update, delete: if admin(storeId) || (signedIn() && request.auth.uid == uid && request.resource.data.status == 'revoked');
+      }
+      match /pairRequests/{requestId} {
+        allow create: if signedIn() && request.resource.data.requesterUid == request.auth.uid && request.resource.data.status == 'pending';
+        allow get: if signedIn() && (resource.data.requesterUid == request.auth.uid || admin(storeId));
+        allow list: if admin(storeId);
+        allow update: if admin(storeId);
+      }
+      match /pairings/{code} {
+        allow create: if admin(storeId) && request.resource.data.createdBy == get(/databases/$(database)/documents/stores/$(storeId)/members/$(request.auth.uid)).data.deviceId;
+        allow get: if signedIn();
+        allow update: if signedIn() && resource.data.usedAt == null && request.resource.data.usedBy == request.auth.uid;
+        allow list, delete: if admin(storeId);
+      }
+      match /operations/{operationId} {
+        allow read: if member(storeId);
+        allow create: if member(storeId) && request.resource.data.deviceId == get(/databases/$(database)/documents/stores/$(storeId)/members/$(request.auth.uid)).data.deviceId;
+        allow update, delete: if admin(storeId);
+      }
+      /* إشعارات Web Push: مفتاح VAPID للمتجر يسجّله الأدمن فقط (فيه السرّ الخاص)،
+         واشتراك كل جهاز يكتبه صاحبه وحده حتى لا يسجّل جهازًا على حساب غيره. */
+      match /push/config {
+        allow read: if member(storeId);
+        allow write: if admin(storeId) || ownsStore(storeId);
+      }
+      match /pushDevices/{uid} {
+        allow read: if member(storeId);
+        allow create, update: if signedIn() && request.auth.uid == uid
+          && request.resource.data.uid == uid
+          && request.resource.data.storeId == storeId;
+        allow delete: if signedIn() && (request.auth.uid == uid || admin(storeId));
+      }
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
