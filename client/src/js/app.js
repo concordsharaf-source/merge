@@ -59,6 +59,8 @@ const icon = (name, size = 20) => {
     phone: '<path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.8a2 2 0 0 1-.45 2.11L8.11 9.89a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.35 1.84.59 2.8.72A2 2 0 0 1 22 16.9Z"/>',
     moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/>',
     sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    store: '<path d="M3 10h18M5 10v10h14V10M4 10l1-6h14l1 6M8 20v-5h8v5"/>',
+    user: '<circle cx="12" cy="8" r="3.5"/><path d="M5 21a7 7 0 0 1 14 0"/>',
     monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
     lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
     shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
@@ -474,6 +476,16 @@ function navMarkup() {
     <div class="sidebar__footer"><span class="presence-dot"></span><span>البيانات محفوظة محليًا</span></div>
   </aside>
   <nav class="bottom-nav" data-bottom-nav aria-label="التنقل الرئيسي">${renderItems(bottomItems)}</nav>`;
+}
+function workspaceChromeMarkup() {
+  const storeName = escapeHtml(state.settings?.storeName || "متجرك");
+  const userName = escapeHtml(state.currentUser?.name || "المستخدم");
+  const viewLabel = escapeHtml(NAV_ITEMS.find((item) => item.id === state.view)?.label || "لوحة التحكم");
+  return `<header class="workspace-chrome">
+    <div class="chrome-brand"><span class="chrome-brand__mark">${icon("store", 20)}</span><div><strong>حسابي</strong><small>${storeName}</small></div></div>
+    <div class="chrome-search">${icon("search", 18)}<span>ابحث في المنتجات، الفواتير، العملاء...</span><kbd>F2</kbd></div>
+    <div class="chrome-actions"><button class="chrome-action chrome-action--new" data-action="navigate" data-view="sales">${icon("plus", 18)}<span>عملية جديدة</span></button><button class="chrome-action" data-action="toggle-theme" aria-label="تبديل المظهر">${icon("sun", 18)}</button><span class="chrome-user">${icon("user", 18)}<b>${userName}</b></span></div>
+  </header><div class="workspace-status"><span class="status-pulse"></span><b>متصل محليًا</b><span>•</span><span>${viewLabel}</span><span class="status-spacer"></span><span>${icon("clock", 15)} آخر مزامنة: الآن</span></div>`;
 }
 
 function normalizedMobileNavigationOrder(order = []) {
@@ -1733,7 +1745,7 @@ function renderApplication() {
     if (state.viewHistory.length > 20) state.viewHistory.shift();
   }
   const body = { dashboard: dashboardMarkup, products: productsMarkup, inventory: inventoryMarkup, sales: salesMarkup, invoices: invoicesMarkup, customers: customersMarkup, "customer-payments": customerPaymentsMarkup, suppliers: suppliersMarkup, "supplier-payments": supplierPaymentsMarkup, purchases: purchasesMarkup, expenses: expensesMarkup, cashbox: cashboxMarkup, transfers: transfersMarkup, reports: reportsMarkup, "periodic-inventory": periodicInventoryMarkup, accounts: accountsMarkup, "activity-log": activityLogMarkup, settings: settingsMarkup, "general-settings": generalSettingsMarkup, "brand-settings": brandSettingsMarkup, "navigation-settings": navigationSettingsMarkup, "data-management": dataManagementMarkup }[state.view]?.() || dashboardMarkup();
-  root.innerHTML = `<div class="app-shell">${navMarkup()}<main class="workspace">${body}</main>${salesScannerFabMarkup()}</div>`;
+  root.innerHTML = `<div class="app-shell">${navMarkup()}<div class="app-main"><main class="workspace">${workspaceChromeMarkup()}<div class="workspace-content">${body}</div></main></div>${salesScannerFabMarkup()}</div>`;
   if (state.view === "cashbox" && isAdmin(state.currentUser)) root.querySelector(".workspace")?.insertAdjacentHTML("beforeend", `${collapsiblePanel("shifts", { eyebrow: "صناديق الكاشير", title: "ورديات الكاشير وترحيل الخزنة", subtitle: "مراجعة الورديات وترحيلها إلى الخزنة", badge: `${amount((state.cashierShifts || []).length)} وردية`, glyph: "users" }, cashierShiftSummaryMarkup())}${collapsiblePanel("shiftStats", { eyebrow: "المساءلة المالية", title: "إحصاءات عجز وفائض الكاشير", subtitle: "متابعة الفروقات وتسويتها من الراتب", badge: `${amount((state.cashierShiftStatistics || []).length)} كاشير`, glyph: "chart" }, cashierDifferenceStatisticsMarkup())}${collapsiblePanel("salaries", { eyebrow: "رواتب الشهر الحالي", title: "رواتب الفريق وتسليم المستحقات", subtitle: "الرواتب والسلف وخصومات العجز", badge: `${amount((state.cashierSalarySummaries || []).length)} حساب`, glyph: "wallet" }, cashierSalarySummaryMarkup())}`);
   bindEvents();
   state.lastStableView = state.view;
