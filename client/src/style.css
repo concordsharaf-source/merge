@@ -2028,3 +2028,76 @@ html.is-sales-sheet-open .toolbar--sales { position: static; }
 .stitch-total strong { color:#fff; font-size:24px; font-variant-numeric:tabular-nums; }
 .stitch-credit { border-radius:14px; }
 .stitch-checkout .dialog__actions .checkout-submit { flex:1 1 200px; min-height:52px; border-radius:14px; font-size:15px; }
+
+/* ===== Stitch products/inventory (الدفعة 3) ===== */
+.pd-hero { padding:16px; margin:0 0 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:20px; box-shadow:0 12px 26px rgba(0,81,60,.22); }
+.pd-hero__value { display:grid; gap:2px; }
+.pd-hero__value span { font-size:11px; font-weight:700; opacity:.85; }
+.pd-hero__value strong { font-size:26px; font-variant-numeric:tabular-nums; }
+.pd-hero__minis { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.pd-mini { display:grid; gap:2px; padding:10px 12px; color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:14px; text-align:right; font:inherit; }
+button.pd-mini { cursor:pointer; }
+.pd-mini span { font-size:10px; font-weight:700; opacity:.85; }
+.pd-mini strong { font-size:16px; }
+.pd-mini--alert { background:linear-gradient(145deg,#c42a47,#84132b); border-color:#f28a9c; }
+.pd-cta { display:flex; gap:8px; margin:0 0 12px; }
+.pd-cta .pd-add { flex:1 1 auto; min-height:52px; border-radius:14px; font-size:14px; }
+.pd-cta .pd-reorder { flex:0 0 auto; min-height:52px; border-radius:14px; }
+.stock-pills { display:flex; gap:8px; margin:12px 0 4px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.stock-pills::-webkit-scrollbar { display:none; }
+.stock-pill { flex:0 0 auto; min-height:34px; padding:0 16px; color:var(--color-on-surface-variant); background:var(--color-surface-container-high); border:1px solid transparent; border-radius:999px; font-size:12px; font-weight:800; transition:background .16s var(--ease-out), color .16s var(--ease-out), transform .16s var(--ease-out); }
+.stock-pill:active { transform:scale(.96); }
+.stock-pill.is-active { color:#fff; background:var(--color-primary); box-shadow:0 4px 12px rgba(0,99,70,.28); }
+.stock-pill--low.is-active { background:#b26a00; box-shadow:0 4px 12px rgba(178,106,0,.28); }
+.stock-pill--out.is-active { background:#c42a47; box-shadow:0 4px 12px rgba(196,42,71,.28); }
+.pro-profit { color:#187247; }
+.pro-profit small { display:block; font-size:11px; opacity:.8; }
+.pro-profit.is-loss { color:var(--danger); }
+[data-theme="dark"] .pro-profit { color:#7bd8aa; }
+.mobile-product-list .pd-card { padding:12px; margin:12px 0; background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:18px; box-shadow:var(--shadow-soft); }
+.pd-card__top { display:flex; gap:10px; min-width:0; }
+.pd-tile { display:grid; place-items:center; flex:0 0 56px; width:56px; height:56px; background:var(--color-surface-container); border-radius:14px; }
+.pd-tile__icon { font-size:32px; color:var(--color-primary); }
+.pd-card__head { flex:1 1 auto; min-width:0; }
+.pd-card__title { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.pd-card .product-card__main { flex:1 1 auto; min-width:0; padding:0; color:var(--color-on-surface); text-align:right; background:transparent; }
+.pd-card .product-card__main strong { font-size:14px; line-height:1.5; overflow-wrap:anywhere; }
+.pd-card .sp-badge { position:static; flex:0 0 auto; }
+.pd-code { display:block; margin-top:2px; color:var(--color-on-surface-variant); font-size:10px; font-variant-numeric:tabular-nums; }
+.pd-prices { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; }
+.pd-prices > div { display:grid; gap:2px; padding:8px 6px; background:var(--color-surface-container); border-radius:12px; text-align:center; }
+.pd-prices span { color:var(--color-on-surface-variant); font-size:9px; font-weight:700; }
+.pd-prices strong { color:var(--color-on-surface); font-size:14px; font-variant-numeric:tabular-nums; }
+.pd-prices strong small { display:block; font-size:10px; }
+.pd-prices .is-profit { color:#187247; }
+.pd-prices .is-loss { color:var(--danger); }
+[data-theme="dark"] .pd-prices .is-profit { color:#7bd8aa; }
+.pd-supplier { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; color:var(--color-on-surface-variant); font-size:10px; }
+.pd-supplier .product-supplier-actions { gap:4px; }
+.pd-supplier .icon-button { width:32px; height:32px; }
+.pd-card__actions { display:flex; gap:8px; margin-top:10px; }
+.pd-card__actions .pd-count { flex:1 1 auto; min-height:46px; border-radius:12px; font-size:12px; }
+.pd-card__actions .icon-button { flex:0 0 46px; width:46px; min-height:46px; border:1px solid var(--color-outline-variant); border-radius:12px; }
+.inventory-row .inventory-icon { flex-basis:52px; width:52px; height:52px; background:var(--color-surface-container); border-radius:14px; }
+.inventory-row .inventory-icon .material-symbols-outlined { color:var(--color-primary); }
+@media (max-width:599px) {
+  .inventory-list .inventory-row { flex-direction:column; align-items:stretch; gap:10px; padding:14px; margin:10px 0; background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:18px; }
+  .inventory-list .inv-card:nth-child(even) { background:var(--color-surface-container-lowest); border-radius:18px; }
+  .inventory-list .inventory-row__stock { justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .inventory-list .inventory-row__stock > div { justify-items:start; }
+  .inventory-list .inventory-row__stock .button { display:inline-flex; min-height:44px; }
+  .inventory-list .inventory-row__stock .status { display:inline-flex; }
+}
+.recent-movements { margin-top:14px; padding:6px 14px 12px; }
+.recent-movements .panel__head { padding:10px 0 2px; }
+.recent-movements h2 { margin:0; font-size:16px; }
+.recent-movements .movement-list { max-height:none; overflow:visible; padding-bottom:0; }
+.stitch-dialog .dialog__head h2 { font-size:20px; }
+.stitch-dialog .stock-before { border-radius:14px; }
+.stitch-dialog input:not([type="checkbox"]):not([type="radio"]), .stitch-dialog select, .stitch-dialog textarea { border-radius:12px; }
+.stitch-dialog .product-package-fieldset { border-radius:14px; }
+.stitch-dialog .barcode-field__control .button { min-height:48px; }
+.stitch-dialog .dialog__actions .button--primary { flex:1 1 200px; min-height:52px; border-radius:14px; }
+.stitch-dialog .warning-row { padding:10px; margin-bottom:8px; border:1px solid var(--color-outline-variant); border-radius:12px; }
+.stitch-dialog .reorder-group { gap:12px; }
+.stitch-dialog .dialog__danger { border-radius:12px; }
