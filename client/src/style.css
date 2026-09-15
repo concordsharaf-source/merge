@@ -1963,3 +1963,68 @@ html.is-sales-sheet-open .toolbar--sales { position: static; }
 .cart-sheet-close { color: #fff4bd; background: #174b40; border-color: #d6ad50; }
 .cart-sheet-close:hover { color: #14372f; background: #f3cf70; }
 [data-theme="dark"] .cart-sheet-close:hover { color: #123d38; background: #f3cf70; }
+
+/* ===== Stitch POS: شاشة البيع (الدفعة 2) ===== */
+.sale-sync-strip { display:flex; align-items:center; gap:8px; padding:8px 14px; margin:0 0 10px; color:var(--color-on-surface-variant); background:var(--color-surface-container-low); border:1px solid var(--color-outline-variant); border-radius:999px; font-size:11px; font-weight:700; }
+.sale-sync-strip .material-symbols-outlined { color:var(--color-primary); }
+.sale-sync-strip__live { display:inline-flex; align-items:center; gap:5px; margin-inline-start:auto; color:var(--color-primary); white-space:nowrap; }
+.sale-sync-dot { width:7px; height:7px; border-radius:50%; background:var(--color-primary); animation:saleSyncPulse 1.8s ease-in-out infinite; }
+@keyframes saleSyncPulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
+.sales-topbar-actions { margin:0 0 12px; flex-wrap:wrap; }
+.sales-topbar-actions .button { min-height:40px; border-radius:12px; }
+.sale-chips { display:flex; gap:8px; margin:12px 0 4px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.sale-chips::-webkit-scrollbar { display:none; }
+.sale-chip { flex:0 0 auto; min-height:34px; padding:0 16px; color:var(--color-on-surface-variant); background:var(--color-surface-container-high); border:1px solid transparent; border-radius:999px; font-size:12px; font-weight:800; transition:background .16s var(--ease-out), color .16s var(--ease-out), transform .16s var(--ease-out); }
+.sale-chip:active { transform:scale(.96); }
+.sale-chip.is-active { color:var(--color-on-primary); background:var(--color-primary); box-shadow:0 4px 12px rgba(0,99,70,.28); }
+.sale-section-head { display:flex; align-items:flex-end; justify-content:space-between; gap:8px; margin:8px 0 10px; }
+.sale-section-head > div { display:flex; align-items:center; gap:8px; min-width:0; }
+.sale-section-head strong { color:var(--color-on-surface); font-size:16px; }
+.sale-section-count { padding:3px 10px; color:var(--color-on-primary); background:var(--color-primary); border-radius:999px; font-size:10px; font-weight:800; white-space:nowrap; }
+.sale-section-head small { color:var(--color-on-surface-variant); font-size:10px; white-space:nowrap; }
+.sales-catalog .sale-matches { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+@media (min-width:700px) { .sales-catalog .sale-matches { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (min-width:1100px) { .sales-catalog .sale-matches { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+.sale-matches .sale-product { display:flex; flex-direction:column; align-items:stretch; gap:5px; padding:10px; text-align:right; background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:18px; box-shadow:var(--shadow-soft); }
+.sale-matches .sale-product:hover { transform:translateY(-2px); border-color:var(--color-primary); }
+.sale-matches .sale-product.is-in-cart { border-color:var(--color-primary); }
+.sale-matches .sale-product-line { position:relative; display:block; }
+.sale-matches .sale-product-line > .product-supplier-actions { position:absolute; top:6px; inset-inline-end:6px; z-index:2; flex-direction:column; padding:3px; background:rgba(255,255,254,.88); border-radius:10px; box-shadow:var(--shadow-soft); }
+[data-theme="dark"] .sale-matches .sale-product-line > .product-supplier-actions { background:rgba(20,32,28,.88); }
+.sp-media { position:relative; display:grid; place-items:center; aspect-ratio:16/10; background:var(--color-surface-container); border-radius:12px; overflow:hidden; }
+.sp-media__icon { font-size:44px; color:var(--color-primary); opacity:.85; }
+.sp-badge { position:absolute; top:6px; inset-inline-start:6px; padding:3px 9px; border:1px solid; border-radius:999px; font-size:10px; font-weight:800; white-space:nowrap; }
+.sp-badge--ok { color:#0b5c43; background:#d9f2e5; border-color:#9fdcbf; }
+.sp-badge--low { color:#8a5a00; background:#ffedd4; border-color:#f5c66b; }
+.sp-badge--out { color:var(--color-on-error); background:var(--color-error); border-color:var(--color-error); }
+[data-theme="dark"] .sp-badge--ok { color:#c9f5e0; background:rgba(20,90,70,.5); border-color:#2e7d5f; }
+[data-theme="dark"] .sp-badge--low { color:#ffe1ae; background:rgba(120,75,0,.45); border-color:#a8761f; }
+.sp-soldout { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:4px; padding:4px; color:#fff; background:rgba(17,28,45,.55); font-size:10px; font-weight:800; text-align:center; }
+.sale-matches .sale-product .sp-code { color:var(--color-on-surface-variant); font-size:10px; font-variant-numeric:tabular-nums; }
+.sale-matches .sale-product .arabic-product-name { display:-webkit-box; min-height:2.9em; font-size:13px; line-height:1.5; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.sale-matches .sale-product > small { color:var(--color-on-surface-variant); font-size:10px; }
+.sp-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:auto; padding-top:4px; }
+.sp-price { color:var(--color-primary); font-size:16px; font-weight:900; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.sale-matches .sale-product .sp-foot > i:not(.sale-product__count) { width:36px; height:36px; border-radius:50%; font-size:20px; }
+.sale-matches .sale-product .sp-foot > i.sale-product__count { height:36px; min-width:36px; padding-inline:10px; border-radius:999px; }
+.sale-matches .sale-product.is-in-cart .sp-foot > i { color:#fff; background:var(--color-primary); }
+.cart-total .cart-actions-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.cart-total .cart-actions-grid .checkout-launch, .cart-total .cart-actions-grid .button--wide { grid-column:1 / -1; }
+.cart-total .tender-btn { display:flex; align-items:center; justify-content:center; gap:6px; min-height:50px; padding:0 8px; color:#fff4ce; background:rgba(243,207,112,.14); border:1px solid #c29a3e; border-radius:12px; font-size:11px; font-weight:800; }
+.cart-total .tender-btn:hover { background:rgba(243,207,112,.24); }
+.cart-total .tender-btn .material-symbols-outlined { color:#f3cf70; }
+.stitch-checkout .dialog__head { align-items:center; padding-bottom:10px; }
+.stitch-checkout .dialog__head h2 { font-size:20px; }
+.stitch-lines > div { padding:8px 12px; background:var(--color-surface-container-low); border:1px solid var(--color-outline-variant); border-radius:12px; }
+.stitch-checkout .payment-method-toggle { border-color:var(--color-outline-variant); border-radius:14px; }
+.stitch-checkout .payment-method-toggle__button { display:flex; align-items:center; justify-content:center; gap:6px; min-height:50px; }
+.stitch-paytype { gap:8px; padding:10px; border-radius:14px; }
+.stitch-paytype label { position:relative; flex:1; justify-content:center; padding:10px; background:var(--color-surface-container-low); border:1px solid var(--color-outline-variant); border-radius:12px; font-weight:800; cursor:pointer; }
+.stitch-paytype label input { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+.stitch-paytype label:has(input:checked) { color:var(--color-on-primary); background:var(--color-primary); border-color:var(--color-primary); }
+.stitch-paytype label:has(input:focus-visible) { outline:2px solid var(--color-primary); outline-offset:2px; }
+.stitch-total { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; background:var(--color-primary-container); border-radius:14px; }
+.stitch-total span { color:var(--color-on-primary-container); font-weight:800; }
+.stitch-total strong { color:#fff; font-size:24px; font-variant-numeric:tabular-nums; }
+.stitch-credit { border-radius:14px; }
+.stitch-checkout .dialog__actions .checkout-submit { flex:1 1 200px; min-height:52px; border-radius:14px; font-size:15px; }
