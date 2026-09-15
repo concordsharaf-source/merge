@@ -2101,3 +2101,56 @@ button.pd-mini { cursor:pointer; }
 .stitch-dialog .warning-row { padding:10px; margin-bottom:8px; border:1px solid var(--color-outline-variant); border-radius:12px; }
 .stitch-dialog .reorder-group { gap:12px; }
 .stitch-dialog .dialog__danger { border-radius:12px; }
+
+/* ===== Stitch checkout/invoices (الدفعة 4) ===== */
+.co-hero { display:grid; gap:2px; padding:14px 16px; margin-bottom:12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:16px; box-shadow:0 10px 22px rgba(0,81,60,.22); text-align:center; }
+.co-hero span { font-size:11px; font-weight:700; opacity:.85; }
+.co-hero strong { font-size:30px; font-variant-numeric:tabular-nums; }
+.stitch-checkout .stitch-field { display:grid; gap:6px; font-size:12px; font-weight:800; }
+.stitch-checkout .stitch-field input:not([type="checkbox"]):not([type="radio"]), .stitch-checkout .stitch-field select { border-radius:12px; }
+.stitch-checkout #paid-amount { font-size:20px; font-weight:800; font-variant-numeric:tabular-nums; }
+.inv-hero { padding:16px; margin:0 0 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:20px; box-shadow:0 12px 26px rgba(0,81,60,.22); }
+.inv-hero__value { display:grid; gap:2px; }
+.inv-hero__value span { font-size:11px; font-weight:700; opacity:.85; }
+.inv-hero__value strong { font-size:26px; font-variant-numeric:tabular-nums; }
+.inv-hero__value small { font-size:11px; font-weight:700; opacity:.85; }
+.inv-hero__minis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+.inv-mini { display:grid; gap:2px; padding:10px 8px; color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:14px; text-align:center; }
+.inv-mini span { font-size:9px; font-weight:700; opacity:.85; }
+.inv-mini strong { font-size:14px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.inv-chips { display:flex; gap:8px; margin:12px 0 4px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.inv-chips::-webkit-scrollbar { display:none; }
+.inv-chip { flex:0 0 auto; min-height:34px; padding:0 16px; color:var(--color-on-surface-variant); background:var(--color-surface-container-high); border:1px solid transparent; border-radius:999px; font-size:12px; font-weight:800; }
+.inv-chip.is-active { color:#fff; background:var(--color-primary); box-shadow:0 4px 12px rgba(0,99,70,.28); }
+.inv-custom-range { display:flex; gap:8px; margin:4px 0 8px; }
+.inv-custom-range input { flex:1 1 0; min-width:0; }
+.inv-pills { display:flex; gap:8px; margin:8px 0 4px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.inv-pills::-webkit-scrollbar { display:none; }
+.inv-pill { flex:0 0 auto; display:grid; gap:1px; min-width:108px; padding:7px 14px; color:var(--color-on-surface-variant); background:var(--color-surface-container-high); border:1px solid transparent; border-radius:14px; text-align:right; font-size:11px; font-weight:800; }
+.inv-pill strong { font-size:13px; font-variant-numeric:tabular-nums; }
+.inv-pill.is-active { color:#fff; background:var(--color-primary); box-shadow:0 4px 12px rgba(0,99,70,.28); }
+.inv-pill--credit strong { color:#b26a00; }
+.inv-pill--credit.is-active strong { color:#fff; }
+.invoice-list .inv-card { display:block; padding:12px; margin:12px 0; background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:18px; box-shadow:var(--shadow-soft); }
+.invoice-list .inv-card:nth-child(even) { background:var(--color-surface-container-lowest); border-radius:18px; }
+.inv-card__head { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.inv-card__head strong { font-size:15px; font-variant-numeric:tabular-nums; }
+.inv-status { flex:0 0 auto; padding:3px 12px; border-radius:999px; font-size:10px; font-weight:800; }
+.inv-status--cash { color:#0b5c40; background:#d9f2e3; }
+.inv-status--transfer { color:#1f5c99; background:#d9e9f8; }
+.inv-status--credit { color:#8a4b00; background:#ffe7c2; }
+[data-theme="dark"] .inv-status--cash { color:#7bd8aa; background:#14402d; }
+[data-theme="dark"] .inv-status--transfer { color:#8fc3f5; background:#1d3a56; }
+[data-theme="dark"] .inv-status--credit { color:#ffcf8a; background:#4a2f10; }
+.inv-card__meta { display:block; margin-top:6px; color:var(--color-on-surface-variant); font-size:11px; }
+.inv-card__note { display:flex; align-items:flex-start; gap:6px; margin-top:8px; padding:8px 10px; color:var(--color-on-surface-variant); background:var(--color-surface-container); border-radius:12px; font-size:10px; line-height:1.7; }
+.inv-card__foot { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.inv-card__total { color:var(--color-primary); font-size:20px; font-variant-numeric:tabular-nums; }
+.inv-card__actions { display:flex; flex-wrap:wrap; gap:6px; }
+.inv-card__actions .button { min-height:42px; padding:0 12px; border-radius:12px; font-size:12px; }
+.stitch-dialog .dialog__actions { flex-wrap:wrap; }
+.stitch-dialog .invoice-cashier-card { border-radius:14px; }
+.stitch-dialog .invoice-customer-card { border-radius:14px; }
+.stitch-dialog .invoice-detail { font-size:13px; }
+.stitch-dialog .invoice-detail__final strong { font-size:20px; }
+.stitch-dialog .invoice-detail > div { align-items:flex-start; }
