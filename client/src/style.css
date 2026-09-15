@@ -2222,3 +2222,13 @@ button.pd-mini { cursor:pointer; }
 [data-theme="dark"] .cashbox-panels .is-positive { color:#7bd8aa; }
 .stitch-dialog .cashier-shift-handover__received { border-radius:14px; }
 .stitch-dialog .cashier-shortage-deduction-preview { border-radius:14px; }
+
+/* ===== Stitch purchases + expenses (الدفعة 7) ===== */
+.pc-cta { display:flex; margin:0 0 12px; }
+.pc-cta .button { flex:1; min-height:52px; border-radius:14px; font-size:14px; }
+.ex-cta { display:flex; gap:8px; margin:0 0 12px; }
+.ex-cta .button { flex:1 1 0; min-height:52px; border-radius:14px; font-size:14px; }
+.invoice-list .invoice-row__mark { border-radius:12px; }
+.expense-period-grid .entity-row__icon, .salary-expense-section .entity-row__icon { border-radius:12px; }
+.stitch-dialog .purchase-picker { border-radius:14px; }
+.stitch-dialog .purchase-line { border-radius:14px; }
