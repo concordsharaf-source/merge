@@ -2270,3 +2270,7 @@ button.pd-mini { cursor:pointer; }
 .settings-contact-card__phone, .settings-contact-card__email { color:var(--green-deep); font-weight:800; font-size:13px; }
 .settings-contact-card small { color:var(--muted); font-size:11px; }
 .stitch-dialog .confirm-dialog { display:grid; gap:4px; }
+
+/* ===== Stitch final sweep (الدفعة 10) ===== */
+.held-invoices-list .held-icon { border-radius:12px; }
+.stitch-dialog .import-choice-button { border-radius:14px; }
