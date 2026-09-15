@@ -216,13 +216,13 @@ test("يوفر الجرد الدوري لقطة محفوظة ومقارنة من
   assert.match(css, /\.periodic-inventory-detail/);
 });
 
-test("يدعم البحث المباشر برقم الفاتورة ويعرض عددي المنتجات والفواتير بأرقام إنجليزية في الرئيسية", async () => {
+test("يدعم البحث المباشر برقم الفاتورة ويعرض عدّادات الرئيسية بأرقام إنجليزية", async () => {
   const app = await readFile(new URL("../client/src/js/app.js", import.meta.url), "utf8");
   assert.match(app, /invoiceQuery: ""/);
   assert.match(app, /id="invoice-search"/);
   assert.match(app, /bindSearchInput\("#invoice-search", "invoiceQuery"\)/);
-  assert.match(app, /amountLatin\(dashboard\.productCount\)/);
   assert.match(app, /amountLatin\(dashboard\.todayInvoiceCount\)/);
+  assert.match(app, /amountLatin\(low\.length\)/);
 });
 
 test("يعرض رأس التطبيق اسم المتجر بدل نوع النشاط", async () => {
@@ -389,9 +389,9 @@ test("تستخدم أزرار الوضع الداكن زمرديًا عميقً�
 test("توحّد واجهة سطح المكتب حقول النماذج وتبرز القائمة الجانبية في الوضعين", async () => {
   const css = await readFile(new URL("../client/src/style.css", import.meta.url), "utf8");
   assert.match(css, /@media \(min-width:960px\) \{[\s\S]*?\.form-grid>label>input,\.form-grid>label>select \{ height:46px; font-size:15px;/);
-  assert.match(css, /\.sidebar \.nav-item\.is-active \{ color:#fff; background:linear-gradient\(145deg,#21755f,#16473b\);/);
-  assert.match(css, /\[data-theme="dark"\] \.sidebar \.nav-item \{ color:#d8eee2; background:rgba\(255,255,255,\.025\);/);
-  assert.match(css, /\[data-theme="dark"\] \.sidebar \.nav-item\.is-active \{ color:#fff; background:linear-gradient\(145deg,#238465,#14513f\);/);
+  assert.match(css, /\.sidebar \.nav-item\.is-active \{ color:var\(--color-on-primary\); background:var\(--color-primary\);/);
+  assert.match(css, /\[data-theme="dark"\] \.sidebar \.nav-item \{ color:var\(--color-on-surface-variant\); background:transparent;/);
+  assert.match(css, /\[data-theme="dark"\] \.sidebar \.nav-item\.is-active \{ color:var\(--color-on-primary\); background:var\(--color-primary\);/);
 });
 
 test("ترتب بطاقة بيانات المتجر مستقلة عن بطاقة ترتيب الهاتف على سطح المكتب", async () => {
@@ -613,8 +613,8 @@ test("يعرض خصم السطر والخصم العام بصيغة مبلغ أ�
   assert.match(style, /\.delivery-compact \{ display:grid; grid-template-columns:repeat\(3,minmax\(0,1fr\)\); align-items:end;/);
   assert.match(style, /\.delivery-choice \{ position:relative;[\s\S]*?align-self:end; min-height:29px; height:29px;/);
   assert.match(app, /<button class="button button--secondary" type="submit">ابحث<\/button>/);
-  assert.match(style, /\.nav-item \{[^}]*color:#315a4b;/);
-  assert.match(style, /\[data-theme="dark"\] \.bottom-nav \.nav-item \{ color:#d9f4e6; \}/);
+  assert.match(style, /\.nav-item \{[^}]*color:var\(--color-on-surface-variant\);/);
+  assert.match(style, /\[data-theme="dark"\] \.bottom-nav \.nav-item \{ color:var\(--color-on-surface-variant\); \}/);
   assert.match(style, /\.metric-card \{[^}]*background:#12634f;[^}]*border:2px solid #76d8b2;/);
   assert.doesNotMatch(style, /\.metric-card--sales/);
   assert.doesNotMatch(app, /metric-card--/);

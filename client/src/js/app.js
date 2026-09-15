@@ -230,7 +230,7 @@ function bindContactPicker(overlay, phoneInputId, nameInputName = "name") {
 const paymentChannelLabel = (invoice) => invoice?.paymentType === "آجل" ? "دين" : invoice?.paymentMethod === "تحويل" ? "تحويل" : "كاش";
 const assetBaseUrl = "https://hesabipwa-2r9mmdzn.manus.space/manus-storage";
 const emptyImage = `${assetBaseUrl}/hesabi-empty-inventory_96623fe2.png`;
-const markImage = `${assetBaseUrl}/hesabi-mark_5cb0429a.png`;
+const markImage = "/hesabi-logo.png";
 const LOCAL_STORE_LOGO_PATTERN = /^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/]+={0,2}$/i;
 const LOCAL_STORE_LOGO_MAX_SOURCE_BYTES = 5 * 1024 * 1024;
 const LOCAL_STORE_LOGO_MAX_STORED_BYTES = 440 * 1024;
@@ -461,21 +461,53 @@ async function refresh() {
   state.todayTransfers = calculateTransferCollections({ sales: state.sales.filter((sale) => dateKey(sale.date) === dateKey()), customerPayments: state.customerPayments.filter((payment) => dateKey(payment.date) === dateKey()) });
 }
 
+/* Stitch: أيقونات Material Symbols وعناوين العروض للشاشات المحوّلة (icon() تبقى للقديمة). */
+const msymbol = (name, cls = "text-[22px]") => `<span class="material-symbols-outlined ${cls}" aria-hidden="true">${name}</span>`;
+const NAV_MSYMBOL = { dashboard: "dashboard", products: "inventory_2", sales: "point_of_sale", customers: "group", suppliers: "local_shipping", purchases: "shopping_cart", cashbox: "account_balance_wallet", reports: "query_stats", settings: "tune" };
+const brandLogoUrl = () => storeLogoDataUrl() || "/hesabi-logo.png";
+const currentCurrency = () => CURRENCIES.find((item) => item.code === (state.settings?.currency || DEFAULT_CURRENCY_CODE)) || CURRENCIES[0];
+const currencySymbol = () => currentCurrency().symbol;
+function viewLabel(view) {
+  const known = { dashboard: "الرئيسية", products: "المنتجات", inventory: "المخزون", sales: "نقطة البيع", invoices: "الفواتير", customers: "العملاء", "customer-payments": "دفعات العملاء", suppliers: "الموردون", "supplier-payments": "دفعات الموردين", purchases: "المشتريات", expenses: "المصروفات", cashbox: "الصندوق", transfers: "التحويلات", reports: "التقارير", "periodic-inventory": "الجرد الدوري", accounts: "الحسابات", "activity-log": "سجل النشاط", settings: "الإعدادات", "general-settings": "الإعدادات العامة", "brand-settings": "شعار المتجر", "navigation-settings": "ترتيب الهاتف", "data-management": "إدارة البيانات" };
+  return known[view] || NAV_ITEMS.find((item) => item.id === view)?.label || "حسابي";
+}
+/* «منذ 5 دقائق» — عرض فقط لسجل النشاط. */
+function timeAgo(value) {
+  const then = new Date(value).getTime();
+  if (!then || Number.isNaN(then)) return "";
+  const mins = Math.max(0, Math.floor((Date.now() - then) / 60000));
+  if (mins < 1) return "الآن";
+  if (mins < 60) return `منذ ${amount(mins)} ${mins === 1 ? "دقيقة" : mins === 2 ? "دقيقتين" : "دقائق"}`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `منذ ${amount(hours)} ${hours === 1 ? "ساعة" : hours === 2 ? "ساعتين" : "ساعات"}`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "أمس";
+  if (days === 2) return "قبل يومين";
+  if (days <= 10) return `قبل ${amount(days)} أيام`;
+  return formatDate(value);
+}
+
 function navMarkup() {
   const accessibleItems = NAV_ITEMS.filter((item) => canAccessView(state.currentUser, item.id));
-  const renderItems = (items) => items.map((item) => `<button class="nav-item ${state.view === item.id ? "is-active" : ""}" data-action="navigate" data-view="${item.id}">${icon(item.icon)}<span>${item.label}</span></button>`).join("");
+  const renderItems = (items) => items.map((item) => `<button class="nav-item ${state.view === item.id ? "is-active" : ""}" data-action="navigate" data-view="${item.id}" ${state.view === item.id ? 'aria-current="page"' : ""} title="${item.label}">${msymbol(NAV_MSYMBOL[item.id] || "dashboard")}<span>${item.label}</span></button>`).join("");
   const configuredOrder = normalizedMobileNavigationOrder(state.settings?.mobileNavigationOrder);
   const bottomItems = configuredOrder.map((id) => accessibleItems.find((item) => item.id === id)).filter(Boolean);
   const items = renderItems(accessibleItems);
   return `<aside class="sidebar">
-    <div class="brand"><img src="${storeLogoUrl()}" alt="شعار ${escapeHtml(state.settings?.storeName || "المتجر")}" /><div><strong>حسابي</strong><small>${escapeHtml(state.settings?.storeName || "متجرك")}</small></div></div>
-    <div class="sidebar__label">تشغيل المتجر</div><nav>${items}</nav>
-    <div class="sidebar__account"><span class="account-badge account-badge--${state.currentUser?.role || "cashier"}">${roleLabel(state.currentUser?.role)}</span><strong>${escapeHtml(state.currentUser?.name || "")}</strong><button class="text-button" data-action="account-session">تبديل المستخدمين</button></div>
-    <div class="sidebar__footer"><span class="presence-dot"></span><span>البيانات محفوظة محليًا</span></div>
+    <div class="flex items-center gap-3 px-2 pt-1 pb-7"><img src="${brandLogoUrl()}" alt="شعار ${escapeHtml(state.settings?.storeName || "المتجر")}" class="w-10 h-10 object-contain shrink-0" /><div class="min-w-0"><strong class="font-headline-sm text-headline-sm text-on-surface block leading-tight">حسابي</strong><small class="font-label-sm text-label-sm text-on-surface-variant block truncate">${escapeHtml(state.settings?.storeName || "متجرك")}</small></div></div>
+    <div class="font-label-sm text-label-sm font-bold text-on-surface-variant px-3 pb-2">تشغيل المتجر</div><nav class="grid gap-1.5" aria-label="التنقل الرئيسي">${items}</nav>
+    <div class="mt-4 p-3 rounded-xl bg-surface-container-low border border-outline-variant grid gap-1.5"><span class="account-badge account-badge--${state.currentUser?.role || "cashier"}">${roleLabel(state.currentUser?.role)}</span><strong class="font-label-lg text-label-lg text-on-surface truncate">${escapeHtml(state.currentUser?.name || "")}</strong><button class="text-button" data-action="account-session">تبديل المستخدمين</button></div>
+    <div class="mt-auto pt-4 flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant px-2"><span class="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0"></span><span>البيانات محفوظة محليًا</span></div>
   </aside>
   <nav class="bottom-nav" data-bottom-nav aria-label="التنقل الرئيسي">${renderItems(bottomItems)}</nav>`;
 }
 
+/* الرأس العام اللاصق (Stitch): شعار المتجر + الحالة + البحث + المظهر + الماسح + الحساب. */
+function appHeaderMarkup() {
+  const themeGlyph = resolvedTheme() === "dark" ? "light_mode" : "dark_mode";
+  const themeLabel = themePreference() === "system" ? `يتبع ضبط الجهاز (${systemPrefersDark() ? "داكن" : "فاتح"}) — اضغط للوضع الفاتح` : themePreference() === "light" ? "الوضع الفاتح — اضغط للوضع الداكن" : "الوضع الداكن — اضغط لاتباع ضبط الجهاز";
+  return `<header class="app-header bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0 flex-1"><img src="${brandLogoUrl()}" alt="حسابي" class="h-8 w-auto object-contain shrink-0" /><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate leading-none">${escapeHtml(storeDisplayName())}</span><span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm inline-flex items-center gap-1 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>متصل محلياً</span></div><span class="font-label-sm text-label-sm text-on-surface-variant truncate">حسابي • ${escapeHtml(viewLabel(state.view))}</span></div></div><div class="flex items-center gap-1 shrink-0"><button aria-label="ابحث في التطبيق" title="ابحث في التطبيق" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container transition-colors" data-action="open-app-search" type="button">${msymbol("search", "text-[20px]")}</button><button aria-label="${themeLabel}" title="${themeLabel}" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container transition-colors" data-action="toggle-theme" type="button">${msymbol(themeGlyph, "text-[20px]")}</button><button aria-label="مسح باركود السلعة" title="مسح باركود السلعة" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container transition-colors" data-action="open-sales-scanner" data-mode="sale" type="button">${msymbol("barcode_scanner", "text-[22px]")}</button><button aria-label="تبديل المستخدمين أو تسجيل الخروج" title="تبديل المستخدمين أو تسجيل الخروج" class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 active:scale-95 transition-transform" data-action="account-session" type="button">${msymbol("person", "text-[18px]")}</button></div></div></header>`;
+}
 function normalizedMobileNavigationOrder(order = []) {
   const knownIds = new Set(NAV_ITEMS.map((item) => item.id));
   const configured = Array.isArray(order) ? order.filter((id, index) => knownIds.has(id) && order.indexOf(id) === index) : [];
@@ -717,7 +749,7 @@ function themeToggleMarkup() {
   const glyph = preference === "system" ? "monitor" : preference === "light" ? "sun" : "moon";
   return `<button class="icon-button theme-toggle ${preference === "system" ? "theme-toggle--system" : ""}" data-action="toggle-theme" aria-label="${label}" title="${label}">${icon(glyph, 19)}</button>`;
 }
-function salesScannerFabMarkup() { return `<button class="sales-scanner-fab" data-action="open-sales-scanner" data-mode="sale" aria-label="فتح المبيعات ومسح الباركود" title="بيع ومسح باركود">${icon("cart", 22)}<span>بيع</span></button>`; }
+function salesScannerFabMarkup() { return `<button class="sales-scanner-fab" data-action="open-sales-scanner" data-mode="sale" aria-label="مسح بيع فوري" title="بيع ومسح باركود">${msymbol("qr_code_scanner", "")}<span>مسح بيع فوري</span></button>`; }
 
 function topbarMarkup(title, description, action = "", modifierClass = "") {
   return `<header class="topbar${modifierClass ? ` ${modifierClass}` : ""}"><div><p class="eyebrow topbar__store"><img src="${storeLogoUrl()}" alt="" />${escapeHtml(storeDisplayName())}</p><h1>${title}</h1>${description ? `<p class="topbar__description">${description}</p>` : ""}</div><div class="topbar__actions"><span class="account-badge account-badge--${state.currentUser?.role || "cashier"}">${roleLabel(state.currentUser?.role)}</span>${action}${themeToggleMarkup()}<button class="icon-button lock-screen-btn" data-action="quick-lock" aria-label="قفل الشاشة السريع" title="قفل الشاشة السريع">${icon("lock", 18)}</button><button class="icon-button" data-action="account-session" aria-label="تبديل المستخدمين أو تسجيل الخروج" title="تبديل المستخدمين أو تسجيل الخروج">${icon("users", 18)}</button></div></header>`;
@@ -885,38 +917,219 @@ function runAppSearchEntry(entryId) {
 }
 
 function dashboardMarkup() {
-  const dashboard = state.dashboard;
+  const dashboard = state.dashboard || {};
   const transfers = state.todayTransfers || { total: 0, count: 0 };
-  const low = dashboard.lowStock.slice(0, 5);
-  const todayAtMidnight = new Date(`${dateKey()}T00:00:00`).getTime();
-  const expiring = (state.dashboard?.expiringBatches || []).sort((a, b) => String(a.expiryDate).localeCompare(String(b.expiryDate))).slice(0, 5);
-  return `${topbarMarkup("نظرة على يومك", "تابع المبيعات والمخزون من سجل واحد واضح.", `<button class="button button--primary topbar-sales-action" data-action="navigate" data-view="sales">${icon("cart", 18)}<span>بيع جديد</span></button>`)}
-  <section class="app-search-launch"><button type="button" class="app-search-launch__button" data-action="open-app-search"><span class="app-search-launch__icon">${icon("search", 20)}</span><span class="app-search-launch__text"><strong>ابحث في التطبيق</strong><small>أي صفحة أو خانة أو إجراء — المخزون، الديون، الحوالات، الرواتب، التقارير...</small></span><span class="app-search-launch__hint">بحث</span></button></section>
-  <section class="daily-ribbon"><div><span class="presence-dot"></span><strong>اليوم التشغيلي</strong><small>كل عملية تحفظ على هذا الجهاز تلقائيًا</small></div><div class="daily-ribbon__date">${new Intl.DateTimeFormat("ar-SA-u-nu-latn", { weekday: "long" }).format(new Date())}، ${dateOnly(new Date())}</div></section>
-  <section class="metric-grid">
-    ${metricCard("مبيعات اليوم", money(dashboard.todaySales), "cart", "قيمة الفواتير المكتملة", dashboard.todaySales, "invoices")}
-    ${metricCard("مشتريات اليوم", money(dashboard.todayPurchases), "package", "توريد محفوظ", dashboard.todayPurchases, "purchases")}
-    ${metricCard("مصروفات اليوم", money(dashboard.todayExpenses), "wallet", "تؤثر على صافي الربح", dashboard.todayExpenses, "expenses")}
-    ${metricCard("أرباح اليوم", money(dashboard.todayProfit), "trend", "صافي بعد التكلفة والمصروفات", dashboard.todayProfit, "reports")}
-    ${metricCard("المنتجات", amountLatin(dashboard.productCount), "box", "منتجات فعّالة", 0, "products")}
-    ${metricCard("قيمة المخزون", money(dashboard.inventoryValue), "layers", "وفق سعر الشراء", dashboard.inventoryValue, "inventory")}
-    ${metricCard("فواتير اليوم", amountLatin(dashboard.todayInvoiceCount), "receipt", "عملية بيع محفوظة", 0, "invoices")}
-    ${metricCard("ديون العملاء", money(dashboard.customerDebt), "users", "رصيد مستحق", dashboard.customerDebt, "customers")}
-    ${metricCard("تحويلات اليوم", money(transfers.total), "transfer", transfers.count ? `${amount(transfers.count)} تحصيل بتحويل` : "لا توجد تحويلات اليوم", transfers.total, "transfers")}
-    ${metricCard("دفعات اليوم", money(dashboard.todayCustomerPayments), "check", "تسديد ديون سابقة", dashboard.todayCustomerPayments, "customer-payments")}
-    ${metricCard("مستحقات الموردين", money(dashboard.supplierDebt), "truck", "شراء آجل غير مسدد", dashboard.supplierDebt, "suppliers")}
-    ${metricCard("الداخل للصندوق", money(dashboard.todayCashIn), "plus", "نقد وارد اليوم فقط", dashboard.todayCashIn, "cashbox")}
-  </section>
-  <section class="dashboard-split">
-    <article class="panel panel--low-stock"><div class="panel__head"><div><span class="eyebrow">تنبيه انتهاء الصلاحية</span><h2>منتجات تحتاج متابعة</h2></div><button class="text-button" data-action="navigate" data-view="inventory">عرض المخزون ${icon("arrow", 16)}</button></div>${expiring.length ? `<div class="warning-list">${expiring.map((batch) => { const days = Math.ceil((new Date(`${batch.expiryDate}T00:00:00`).getTime() - todayAtMidnight) / 86400000); return `<button class="warning-row" data-action="open-product" data-id="${batch.productId}"><div class="warning-row__icon">${icon("alert", 18)}</div><div><strong>${escapeHtml(batch.product.name)}</strong><small>${batch.batchNumber ? `تشغيلة ${escapeHtml(batch.batchNumber)} · ` : ""}المتبقي ${amount(batch.remainingQuantity)} ${escapeHtml(batch.product.unit)} · تنتهي ${formatDate(batch.expiryDate)}</small></div><strong class="${days <= 30 ? "is-negative" : ""}">${days < 0 ? "منتهٍ" : `بعد ${amount(days)} يوم`}</strong></button>`; }).join("")}</div>` : `<p class="panel__empty">لا توجد منتجات تنتهي خلال 90 يومًا.</p>`}</article>
-    <article class="panel panel--low-stock"><div class="panel__head"><div><span class="eyebrow">تنبيه تشغيلي</span><h2>مخزون يحتاج انتباهك</h2></div><button class="text-button" data-action="navigate" data-view="inventory">عرض المخزون ${icon("arrow", 16)}</button></div>
-    ${low.length ? `<div class="warning-list">${low.map((product) => `<button class="warning-row" data-action="open-product" data-id="${product.id}"><div class="warning-row__icon">${icon("package", 18)}</div><div><strong>${escapeHtml(product.name)}</strong><small>${amount(product.quantity)} ${escapeHtml(product.unit)} متبقية</small></div>${formatStatus(product)}</button>`).join("")}</div>` : emptyState("لا توجد تنبيهات مخزون", "كل المنتجات أعلى من الحد الأدنى المحدد.", "inventory")}</article>
-    <article class="panel action-panel"><span class="eyebrow">اختصار سريع</span><h2>ابدأ من حيث تكون الحركة</h2><p>أضف منتجًا، عميلًا، توريدًا أو عملية بيع. كل خطوة ترتبط بالسجل المحلي.</p><div class="quick-actions"><button data-action="new-product">${icon("plus", 18)}إضافة منتج</button><button data-action="new-customer">${icon("users", 18)}إضافة عميل</button><button data-action="new-supplier">${icon("truck", 18)}إضافة مورد</button><button data-action="new-purchase">${icon("truck", 18)}فاتورة شراء</button><button data-action="open-reorder-list">${icon("truck", 18)}إعادة الطلب</button><button data-action="navigate" data-view="sales">${icon("cart", 18)}فتح المبيعات</button></div></article>
-    <article class="panel debtor-panel"><div class="panel__head"><div><span class="eyebrow">متابعة التحصيل</span><h2>أعلى العملاء مديونية</h2></div><button class="text-button" data-action="navigate" data-view="customers">عرض العملاء ${icon("arrow", 16)}</button></div>${dashboard.debtors?.length ? `<div class="debtor-list">${dashboard.debtors.map((customer) => `<button class="debtor-row" data-action="open-customer" data-id="${customer.id}"><span>${escapeHtml(customer.name)}</span><strong>${money(customer.balance)}</strong></button>`).join("")}</div>` : `<p class="panel__empty">لا توجد ديون عملاء مستحقة.</p>`}</article>
-    <article class="panel debtor-panel"><div class="panel__head"><div><span class="eyebrow">التزامات التوريد</span><h2>أعلى مستحقات الموردين</h2></div><button class="text-button" data-action="navigate" data-view="suppliers">عرض الموردين ${icon("arrow", 16)}</button></div>${dashboard.creditors?.length ? `<div class="debtor-list">${dashboard.creditors.map((supplier) => `<button class="debtor-row" data-action="open-supplier-account" data-id="${supplier.id}"><span>${escapeHtml(supplier.name)}</span><strong>${money(supplier.balance)}</strong></button>`).join("")}</div>` : `<p class="panel__empty">لا توجد مستحقات موردين حالية.</p>`}</article>
+  const low = (dashboard.lowStock || []).slice(0, 5);
+  const symbol = currencySymbol();
+  const currencyName = currentCurrency().label;
+  const todaySales = toNumber(dashboard.todaySales);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdaySales = (state.sales || []).filter((sale) => dateKey(sale.date) === dateKey(yesterday)).reduce((sum, sale) => sum + toNumber(sale.total), 0);
+  const salesDelta = yesterdaySales > 0 ? Math.round(((todaySales - yesterdaySales) / yesterdaySales) * 100) : null;
+  const alertCount = low.length + (state.products || []).filter((product) => toNumber(product.quantity) <= 0).length;
+  const userRole = state.currentUser?.role || "cashier";
+  const recentSales = [...(state.sales || [])].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+  const recentPayments = [...(state.customerPayments || [])].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 2);
+  const activity = [...recentSales.map((sale) => ({ kind: "sale", date: sale.date, sale })), ...recentPayments.map((payment) => ({ kind: "payment", date: payment.date, payment }))].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+  /* زر يقود لوجهته إن كانت مسموحة، وإلا نص خامل — نفس عهد metricCard. */
+  const navCard = (view, cls, inner) => canAccessView(state.currentUser, view)
+    ? `<button type="button" class="${cls}" data-action="navigate" data-view="${view}">${inner}</button>`
+    : `<article class="${cls}">${inner}</article>`;
+  const hero = navCard("invoices", "block w-full text-right bg-primary text-on-primary p-space-md rounded-xl shadow-sm mb-space-sm relative overflow-hidden active:scale-[0.99] transition-transform", `
+    <span class="relative z-10 flex flex-col gap-1">
+      <span class="flex items-center justify-between gap-2">
+        <span class="font-label-md text-label-md text-on-primary-container">إجمالي مبيعات اليوم (الكل)</span>
+        ${salesDelta === null ? "" : `<span class="inline-flex items-center gap-1 bg-surface-container-lowest/15 px-2 py-0.5 rounded-full font-label-sm text-label-sm text-on-primary whitespace-nowrap">${msymbol("trending_up", "text-[14px]")}${salesDelta >= 0 ? "+" : ""}${amountLatin(salesDelta)}% عن أمس</span>`}
+      </span>
+      <span class="flex items-baseline justify-between gap-2 mt-1">
+        <span class="flex items-baseline gap-1 min-w-0">
+          <span class="font-currency-display text-[clamp(22px,7.5vw,32px)] leading-[1.25] font-extrabold tabular-nums whitespace-nowrap" dir="ltr">${amount(todaySales)}</span>
+          <span class="font-label-md text-label-md text-on-primary-container shrink-0">${symbol}</span>
+        </span>
+        <span class="flex items-center gap-1 bg-surface-container-lowest/20 px-2.5 py-1 rounded-lg shrink-0">${msymbol("receipt_long", "text-[16px]")}<span class="font-label-md text-label-md whitespace-nowrap">${amountLatin(dashboard.todayInvoiceCount)} فاتورة</span></span>
+      </span>
+    </span>
+    <span class="absolute -left-6 -bottom-6 w-36 h-36 opacity-10 pointer-events-none text-on-primary" aria-hidden="true"><svg class="w-full h-full" fill="currentColor" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"></circle></svg></span>`);
+  const mini = (view, label, value, tone, mark, foot) => navCard(view, "bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col justify-between text-right active:scale-[0.98] transition-transform min-w-0", `
+      <span>
+        <span class="flex items-center justify-between gap-1 mb-0.5">
+          <span class="font-label-sm text-label-sm text-on-surface-variant truncate">${label}</span>
+          ${mark}
+        </span>
+        <span class="flex items-baseline gap-1">
+          <span class="font-headline-lg text-[clamp(17px,5.5vw,24px)] leading-[1.35] font-bold tabular-nums whitespace-nowrap ${toNumber(value) < 0 ? "text-error" : tone}" dir="ltr">${amount(value)}</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant shrink-0">${symbol}</span>
+        </span>
+      </span>
+      ${foot}`);
+  const kpiRow1 = `<div class="grid grid-cols-2 gap-space-sm mb-space-sm">
+      ${mini("cashbox", "الداخل للصندوق", dashboard.todayCashIn, "text-primary", `<span class="w-2 h-2 rounded-full bg-primary shrink-0"></span>`, `<span class="mt-2 bg-surface-container-low px-1.5 py-1 rounded text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">${msymbol("payments", "text-[13px] text-primary")}<span class="truncate">نقد فعلي فقط بالدرج</span></span>`)}
+      ${mini("transfers", "تحويلات ومحافظ", transfers.total, "text-secondary", `<span class="w-2 h-2 rounded-full bg-secondary shrink-0"></span>`, `<span class="mt-2 bg-secondary-container px-1.5 py-1 rounded text-on-secondary-container font-label-sm text-label-sm flex items-center gap-1">${msymbol("phone_iphone", "text-[13px]")}<span class="truncate">كريمي / ون كاش</span></span>`)}
+    </div>`;
+  const kpiRow2 = `<div class="grid grid-cols-2 gap-space-sm">
+      ${mini("reports", "أرباح اليوم التقديرية", dashboard.todayProfit, "text-on-surface", msymbol("monitoring", "text-[15px] text-primary"), `<span class="font-label-sm text-label-sm text-primary mt-1 block">صافي بعد خصم التكاليف</span>`)}
+      ${mini("customers", "ديون العملاء بالسوق", dashboard.customerDebt, "text-tertiary", msymbol("assignment_late", "text-[15px] text-tertiary"), `<span class="font-label-sm text-label-sm text-tertiary-container mt-1 block">مستحقات آجلة للتحصيل</span>`)}
+    </div>`;
+  const quickBtn = (action, view, glyph, tile, title, sub) => `<button class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm text-right flex items-center gap-space-sm active:scale-95 transition-transform min-w-0" type="button" data-action="${action}"${view ? ` data-view="${view}"` : ""}>
+      <span class="w-10 h-10 rounded-lg ${tile} flex items-center justify-center shrink-0">${msymbol(glyph, "text-[20px]")}</span>
+      <span class="flex flex-col min-w-0"><span class="font-label-lg text-label-lg text-on-surface truncate">${title}</span><span class="font-label-sm text-label-sm text-on-surface-variant truncate">${sub}</span></span>
+    </button>`;
+  const quickActions = `
+  <section class="py-space-xs">
+    <div class="flex items-center justify-between mb-space-xs">
+      <h2 class="font-headline-sm text-headline-sm text-on-surface">إجراءات تشغيلية سريعة</h2>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">اختصارات فورية</span>
+    </div>
+    <button class="w-full bg-primary text-on-primary rounded-xl px-space-md py-3 flex items-center justify-between shadow-sm active:scale-[0.98] transition-transform mb-space-sm" type="button" data-action="navigate" data-view="sales">
+      <span class="flex items-center gap-space-sm">
+        <span class="w-9 h-9 rounded-lg bg-surface-container-lowest/20 flex items-center justify-center text-on-primary">${msymbol("add_shopping_cart", "text-[24px]")}</span>
+        <span class="flex flex-col text-right">
+          <span class="font-headline-sm text-headline-sm leading-none font-bold">فاتورة بيع جديدة (POS)</span>
+          <span class="font-label-sm text-label-sm text-on-primary-container mt-1">كاشير متواصل مع ماسح الباركود</span>
+        </span>
+      </span>
+      ${msymbol("chevron_left", "text-[24px]")}
+    </button>
+    <div class="grid grid-cols-2 gap-space-sm">
+      ${quickBtn("new-purchase", "", "inventory_2", "bg-secondary-container text-on-secondary-container", "فاتورة شراء", "توريد كراتين وعبوات")}
+      ${quickBtn("navigate", "customer-payments", "price_check", "bg-primary-fixed text-on-primary-fixed", "سند قبض دين", "تحصيل حساب عميل")}
+      ${quickBtn("navigate", "expenses", "receipt", "bg-error-container text-on-error-container", "تسجيل مصروف", "كهرباء ونثريات يومية")}
+      ${quickBtn("navigate", "periodic-inventory", "fact_check", "bg-surface-container-high text-on-surface", "جرد المخزون", "مطابقة الكميات والرف")}
+    </div>
   </section>`;
+  const lowCountLabel = low.length === 1 ? "صنف واحد أوشك" : low.length === 2 ? "صنفان أوشكا" : `${amountLatin(low.length)} أصناف أوشكت`;
+  const lowStock = low.length ? `
+  <section class="pt-space-md pb-space-xs">
+    <div class="bg-tertiary-fixed text-on-tertiary-fixed p-space-md rounded-xl shadow-sm">
+      <div class="flex items-center justify-between gap-2 mb-space-xs">
+        <div class="flex items-center gap-1.5 min-w-0">
+          ${msymbol("warning", "text-tertiary text-[20px]")}
+          <h3 class="font-headline-sm text-headline-sm text-on-tertiary-fixed truncate">أصناف تحت حد الطلب (نواقص)</h3>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-tertiary-fixed-dim text-on-tertiary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0">${lowCountLabel}</span>
+      </div>
+      <div class="flex flex-col gap-space-xs">
+        ${low.map((product) => `
+        <div class="bg-surface-container-lowest p-space-sm rounded-lg flex items-center justify-between gap-2 text-on-surface">
+          <button class="flex flex-col min-w-0 text-right" data-action="open-product" data-id="${product.id}" type="button">
+            <span class="font-label-lg text-label-lg truncate w-full">${escapeHtml(product.name)}</span>
+            <span class="flex items-center gap-space-sm mt-0.5">
+              <span class="font-body-sm text-body-sm text-error font-semibold whitespace-nowrap">متبقي: ${amount(product.quantity)} ${escapeHtml(product.unit)}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">الحد الأدنى: ${amount(product.minimumStock)}</span>
+            </span>
+          </button>
+          <button class="h-8 px-2.5 bg-primary text-on-primary rounded-md font-label-sm text-label-sm shrink-0 flex items-center gap-1 active:scale-95 transition-transform" type="button" data-action="new-purchase">${msymbol("add", "text-[16px]")}أمر شراء</button>
+        </div>`).join("")}
+      </div>
+    </div>
+  </section>` : "";
+  const saleTone = (sale) => sale.paymentType === "آجل"
+    ? { tile: "bg-tertiary-fixed text-on-tertiary-fixed", glyph: "menu_book", badge: "bg-tertiary-fixed-dim text-on-tertiary-fixed", badgeText: "دين آجل", amountCls: "text-tertiary", status: "سجل في الحساب", sub: `العميل: ${escapeHtml(sale.customerName || "")}` }
+    : sale.paymentMethod === "تحويل"
+      ? { tile: "bg-secondary-container text-on-secondary-container", glyph: "account_balance_wallet", badge: "bg-secondary-container text-on-secondary-container", badgeText: "تحويل", amountCls: "text-secondary", status: "حوالة مؤكدة", sub: sale.customerName ? escapeHtml(sale.customerName) : "تحويل بنكي / محفظة" }
+      : { tile: "bg-primary/10 text-primary", glyph: "payments", badge: "bg-primary-fixed text-on-primary-fixed", badgeText: "كاش نقدي", amountCls: "text-primary", status: "مدفوع كامل", sub: sale.customerName ? `العميل: ${escapeHtml(sale.customerName)}` : "عميل نقدي" };
+  const activityRows = activity.map((entry) => {
+    if (entry.kind === "payment") {
+      const payment = entry.payment;
+      const viaTransfer = payment.paymentMethod === "تحويل";
+      const open = payment.customerId ? `data-action="open-customer" data-id="${payment.customerId}"` : `data-action="navigate" data-view="customer-payments"`;
+      return `<button class="w-full bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2 text-right" type="button" ${open}>
+        <span class="flex items-center gap-space-sm min-w-0">
+          <span class="w-10 h-10 rounded-xl bg-primary-fixed text-on-primary-fixed flex items-center justify-center shrink-0">${msymbol("check_circle", "text-[20px]")}</span>
+          <span class="flex flex-col min-w-0">
+            <span class="flex items-center gap-space-xs">
+              <span class="font-label-lg text-label-lg text-on-surface font-bold truncate">#${escapeHtml(payment.invoiceNumber || "سند قبض")}</span>
+              <span class="px-2 py-px rounded bg-surface-container-high text-on-surface font-label-sm text-label-sm whitespace-nowrap">سند قبض</span>
+            </span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">سداد من: ${escapeHtml(payment.customerName || "")} • ${timeAgo(payment.date)}</span>
+          </span>
+        </span>
+        <span class="flex flex-col items-end shrink-0">
+          <span class="flex items-baseline gap-1 text-primary">
+            <span class="font-headline-sm text-headline-sm font-bold tabular-nums whitespace-nowrap" dir="ltr">+${amount(payment.amount)}</span>
+            <span class="font-label-sm text-label-sm">${symbol}</span>
+          </span>
+          <span class="font-label-sm text-label-sm text-primary whitespace-nowrap">${viaTransfer ? "تحويل مؤكد" : "نقد في الصندوق"}</span>
+        </span>
+      </button>`;
+    }
+    const sale = entry.sale;
+    const tone = saleTone(sale);
+    return `<button class="w-full bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex items-center justify-between gap-2 text-right" type="button" data-action="open-invoice" data-id="${sale.id}">
+      <span class="flex items-center gap-space-sm min-w-0">
+        <span class="w-10 h-10 rounded-xl ${tone.tile} flex items-center justify-center shrink-0">${msymbol(tone.glyph, "text-[20px]")}</span>
+        <span class="flex flex-col min-w-0">
+          <span class="flex items-center gap-space-xs">
+            <span class="font-label-lg text-label-lg text-on-surface font-bold truncate">#${escapeHtml(sale.invoiceNumber)}</span>
+            <span class="px-2 py-px rounded ${tone.badge} font-label-sm text-label-sm whitespace-nowrap">${tone.badgeText}</span>
+          </span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">${tone.sub} • ${timeAgo(sale.date)}</span>
+        </span>
+      </span>
+      <span class="flex flex-col items-end shrink-0">
+        <span class="flex items-baseline gap-1 ${tone.amountCls}">
+          <span class="font-headline-sm text-headline-sm font-bold tabular-nums whitespace-nowrap" dir="ltr">${amount(sale.total)}</span>
+          <span class="font-label-sm text-label-sm">${symbol}</span>
+        </span>
+        <span class="font-label-sm text-label-sm ${tone.amountCls} whitespace-nowrap">${tone.status}</span>
+      </span>
+    </button>`;
+  }).join("");
+  const activitySection = `
+  <section class="pt-space-md">
+    <div class="flex items-center justify-between gap-2 mb-space-xs">
+      <div class="flex items-center gap-1.5 min-w-0">
+        ${msymbol("history", "text-primary text-[18px]")}
+        <h2 class="font-headline-sm text-headline-sm text-on-surface truncate">آخر فواتير ومعاملات اليوم</h2>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">${dateTime(new Date())}</span>
+    </div>
+    ${activity.length ? `<div class="flex flex-col gap-space-xs">${activityRows}</div>` : `<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm font-body-sm text-body-sm text-on-surface-variant">لا توجد معاملات بعد — أتم أول عملية بيع لتظهر هنا.</div>`}
+    <button class="mt-space-sm w-full py-space-sm bg-surface-container text-on-surface rounded-xl flex items-center justify-center gap-1.5 font-label-lg text-label-lg active:scale-[0.98] transition-transform" type="button" data-action="navigate" data-view="invoices">
+      <span>عرض كافة سجل الفواتير والمعاملات</span>
+      ${msymbol("arrow_back", "text-[18px]")}
+    </button>
+  </section>`;
+  return `<h1 class="sr-only">نظرة على يومك</h1>
+  <section class="pt-space-sm pb-space-xs flex flex-col gap-space-xs">
+    <div class="flex items-center justify-between gap-2 bg-surface-container-low p-space-sm rounded-xl">
+      <div class="flex items-center gap-space-sm min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">${msymbol("storefront", "text-[24px]")}</div>
+        <div class="flex flex-col min-w-0">
+          <span class="font-headline-sm text-headline-sm text-on-surface truncate">${escapeHtml(storeDisplayName())}</span>
+          <span class="flex items-center gap-space-xs mt-0.5">
+            <span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 min-w-0">${msymbol("shield_person", "text-[14px]")}<span class="truncate">${escapeHtml(state.currentUser?.name || "")} (${roleLabel(userRole)})</span></span>
+            <span class="inline-flex items-center px-1.5 py-px rounded bg-primary text-on-primary font-label-sm text-label-sm whitespace-nowrap shrink-0">${userRole === "admin" ? "أدمن كامل الصلاحيات" : roleLabel(userRole)}</span>
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 shrink-0">
+        <button aria-label="تنبيهات المخزون" title="تنبيهات المخزون" class="relative w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant active:scale-95 transition-transform" type="button" data-action="open-reorder-list">${msymbol("notifications", "text-[20px]")}${alertCount ? `<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span>` : ""}</button>
+        <button aria-label="قفل الشاشة السريع" title="قفل الشاشة السريع" class="w-9 h-9 flex items-center justify-center rounded-lg bg-surface-container text-on-surface-variant active:scale-95 transition-transform" type="button" data-action="quick-lock">${msymbol("lock", "text-[20px]")}</button>
+      </div>
+    </div>
+    <div class="flex items-center justify-between gap-2 px-space-sm py-1 bg-surface-container rounded-lg font-label-sm text-label-sm text-on-surface-variant">
+      <span class="flex items-center gap-1.5 min-w-0">
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0"></span>
+        <span class="font-label-sm text-label-sm text-on-surface truncate">متصل محلياً • تخزين آمن على الجهاز</span>
+      </span>
+      <span class="text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap shrink-0">مزامنة تلقائية نشطة</span>
+    </div>
+  </section>
+  <section class="pt-space-xs pb-space-sm">
+    <div class="flex items-center justify-between gap-2 mb-space-xs">
+      <div class="flex items-center gap-1.5 min-w-0">
+        ${msymbol("account_balance", "text-primary text-[18px]")}
+        <h2 class="font-headline-sm text-headline-sm text-on-surface truncate">مؤشرات اليوم المالية</h2>
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">${escapeHtml(currencyName)}</span>
+    </div>
+    ${hero}
+    ${kpiRow1}
+    ${kpiRow2}
+  </section>${quickActions}${lowStock}${activitySection}`;
 }
-
 /**
  * بطاقة الرقم في لوحة التحكم: مستطيلة، أيقونة كبيرة تدلّ على وظيفتها، ورقمها في سطر واحد.
  * navigateTo اختياري: إن كانت الوجهة معروفة ومسموحة للمستخدم صارت البطاقة زرًا يقود إليها،
@@ -1733,7 +1946,7 @@ function renderApplication() {
     if (state.viewHistory.length > 20) state.viewHistory.shift();
   }
   const body = { dashboard: dashboardMarkup, products: productsMarkup, inventory: inventoryMarkup, sales: salesMarkup, invoices: invoicesMarkup, customers: customersMarkup, "customer-payments": customerPaymentsMarkup, suppliers: suppliersMarkup, "supplier-payments": supplierPaymentsMarkup, purchases: purchasesMarkup, expenses: expensesMarkup, cashbox: cashboxMarkup, transfers: transfersMarkup, reports: reportsMarkup, "periodic-inventory": periodicInventoryMarkup, accounts: accountsMarkup, "activity-log": activityLogMarkup, settings: settingsMarkup, "general-settings": generalSettingsMarkup, "brand-settings": brandSettingsMarkup, "navigation-settings": navigationSettingsMarkup, "data-management": dataManagementMarkup }[state.view]?.() || dashboardMarkup();
-  root.innerHTML = `<div class="app-shell">${navMarkup()}<main class="workspace">${body}</main>${salesScannerFabMarkup()}</div>`;
+  root.innerHTML = `<div class="app-shell">${navMarkup()}<main class="workspace">${appHeaderMarkup()}${body}</main>${salesScannerFabMarkup()}</div>`;
   if (state.view === "cashbox" && isAdmin(state.currentUser)) root.querySelector(".workspace")?.insertAdjacentHTML("beforeend", `${collapsiblePanel("shifts", { eyebrow: "صناديق الكاشير", title: "ورديات الكاشير وترحيل الخزنة", subtitle: "مراجعة الورديات وترحيلها إلى الخزنة", badge: `${amount((state.cashierShifts || []).length)} وردية`, glyph: "users" }, cashierShiftSummaryMarkup())}${collapsiblePanel("shiftStats", { eyebrow: "المساءلة المالية", title: "إحصاءات عجز وفائض الكاشير", subtitle: "متابعة الفروقات وتسويتها من الراتب", badge: `${amount((state.cashierShiftStatistics || []).length)} كاشير`, glyph: "chart" }, cashierDifferenceStatisticsMarkup())}${collapsiblePanel("salaries", { eyebrow: "رواتب الشهر الحالي", title: "رواتب الفريق وتسليم المستحقات", subtitle: "الرواتب والسلف وخصومات العجز", badge: `${amount((state.cashierSalarySummaries || []).length)} حساب`, glyph: "wallet" }, cashierSalarySummaryMarkup())}`);
   bindEvents();
   state.lastStableView = state.view;

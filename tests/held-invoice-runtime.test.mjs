@@ -7,7 +7,7 @@ import { calculateSaleTotals, nowIso } from "../client/src/js/domain.js";
 const appJs = await readFile(new URL("../client/src/js/app.js", import.meta.url), "utf8");
 
 /** رموز تظهر كأنها استدعاءات دوال داخل نصوص CSS/HTML أو اختصارات كائنات، وليست دوالًا عامة. */
-const CSS_AND_METHOD_TOKENS = new Set(["child", "complete", "minmax", "not", "repeat", "rgba", "url", "update", "format"]);
+const CSS_AND_METHOD_TOKENS = new Set(["child", "complete", "minmax", "not", "repeat", "rgba", "url", "update", "format", "clamp", "min", "max", "calc"]);
 
 const BROWSER_GLOBALS = new Set([
   "String", "Number", "Boolean", "Object", "Array", "JSON", "Math", "Date", "Promise", "Map", "Set", "WeakMap", "WeakSet",

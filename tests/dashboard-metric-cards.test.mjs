@@ -71,39 +71,36 @@ test("البطاقة تقود إلى صفحتها عبر مُوجّه التطب
   assert.match(card, /aria-label=/, "الزر بلا وصف ناطق يسمّي وجهته");
 });
 
-test("كل بطاقة في الرئيسية مربوطة بوجهة معروفة، والعدد اثنتا عشرة", () => {
-  const calls = [];
-  for (let i = dash.indexOf("metricCard("); i >= 0; i = dash.indexOf("metricCard(", i + 1)) {
-    let depth = 0;
-    for (let j = i + "metricCard".length; j < dash.length; j += 1) {
-      if (dash[j] === "(") depth += 1;
-      else if (dash[j] === ")") {
-        depth -= 1;
-        if (depth < 0) break; // قوس خارجيًا: نهاية الاستدعاء عند }} القالب
-        if (depth === 0) {
-          calls.push(dash.slice(i, j + 1));
-          break;
-        }
-      }
-    }
-  }
-  assert.equal(calls.length, 12, `عدد بطاقات الرئيسية تغيّر (${calls.length})`);
-  const bound = new Map(
-    calls.map((call) => {
-      const label = /^metricCard\("([^"]+)"/.exec(call)?.[1] || "";
-      const tokens = [...call.matchAll(/"([a-z][a-z-]*)"/g)].map((m) => m[1]);
-      return [label, tokens[tokens.length - 1]];
-    }),
-  );
-  assert.equal(bound.size, 12, `لم تُربط إلا ${bound.size} بطاقة`);
-  const bodyMap = appJs.slice(appJs.indexOf("const body = { dashboard"), appJs.indexOf("const body = { dashboard") + 1400);
-  const known = new Set([...bodyMap.matchAll(/"?([a-z][a-z-]*)"?\s*:/g)].map((m) => m[1]));
-  assert.ok(known.has("sales") && known.has("invoices"), "فشل استخراج خريطة العروض — لا يمكن التحقق من الوجهات");
-  for (const [label, view] of bound) assert.ok(known.has(view), `وجهة غير معروفة (${label} → ${view})`);
-  assert.equal(bound.get("مبيعات اليوم"), "invoices");
-  assert.equal(bound.get("قيمة المخزون"), "inventory");
-  assert.equal(bound.get("الداخل للصندوق"), "cashbox");
-  assert.equal(bound.get("مستحقات الموردين"), "suppliers");
-  assert.equal(bound.get("أرباح اليوم"), "reports");
-  assert.equal(bound.get("ديون العملاء"), "customers");
+test("الرئيسية الجديدة (Stitch): بطاقة الإجمالي والمؤشرات مربوطة بوجهاتها", () => {
+  assert.match(dash, /إجمالي مبيعات اليوم/, "اختفى عنوان بطاقة الإجمالي");
+  assert.match(dash, /navCard\("invoices"/, "بطاقة المبيعات لا تقود للفواتير");
+  assert.match(dash, /mini\("cashbox"/, "بطاقة الصندوق لا تقود للصندوق");
+  assert.match(dash, /mini\("transfers"/, "بطاقة التحويلات لا تقود للتحويلات");
+  assert.match(dash, /mini\("reports"/, "بطاقة الأرباح لا تقود للتقارير");
+  assert.match(dash, /mini\("customers"/, "بطاقة الديون لا تقود للعملاء");
+  assert.match(dash, /canAccessView\(state\.currentUser, view\)/, "بطاقات الرئيسية بلا فحص صلاحية");
+  assert.match(dash, /data-action="navigate" data-view="\$\{view\}"/, "البطاقات لا تستخدم موجّه التطبيق");
+  assert.match(dash, /:\s*`<article/, "البطاقة بلا وجهة مسموحة يجب أن تبقى نصًا خاملًا");
+  assert.match(dash, /tabular-nums/, "أرقام الرئيسية بلا أرقام جدولية");
+  assert.match(dash, /whitespace-nowrap/, "أرقام الرئيسية قد تلتف على سطرين");
+  assert.match(dash, /<h1 class="sr-only">نظرة على يومك<\/h1>/, "الرئيسية بلا عنوان لقارئ الشاشة واختبار التنقل");
+  assert.match(dash, /text-error/, "الرقم السالب فقد دلالته الحمراء");
+  assert.doesNotMatch(dash, /metricCard\(/, "الرئيسية الجديدة يجب ألا تستخدم بطاقات metricCard القديمة");
+});
+
+test("الرئيسية الجديدة (Stitch): إجراءات سريعة ونواقص ونشاط مربوطة بأفعالها", () => {
+  assert.match(dash, /فاتورة بيع جديدة/, "اختفى زر فاتورة البيع");
+  assert.match(dash, /data-view="sales"/, "زر البيع لا يقود لنقطة البيع");
+  assert.match(dash, /quickBtn\("new-purchase"/, "زر الشراء فقد فعله");
+  assert.match(dash, /quickBtn\("navigate", "customer-payments"/, "سند القبض لا يقود للدفعات");
+  assert.match(dash, /quickBtn\("navigate", "expenses"/, "زر المصروف لا يقود للمصروفات");
+  assert.match(dash, /quickBtn\("navigate", "periodic-inventory"/, "زر الجرد لا يقود للجرد الدوري");
+  assert.match(dash, /أصناف تحت حد الطلب/, "اختفى قسم النواقص");
+  assert.match(dash, /data-action="open-product"/, "النواقص لا تفتح الصنف");
+  assert.match(dash, /آخر فواتير ومعاملات اليوم/, "اختفى سجل النشاط");
+  assert.match(dash, /data-action="open-invoice"/, "النشاط لا يفتح الفاتورة");
+  assert.match(dash, /data-action="open-customer"/, "التحصيل لا يفتح حساب العميل");
+  assert.match(dash, /timeAgo\(/, "النشاط بلا زمن نسبي");
+  assert.match(dash, /data-action="open-reorder-list"/, "جرس التنبيهات فقد فعله");
+  assert.match(dash, /data-action="quick-lock"/, "زر القفل السريع مفقود من الرئيسية");
 });
