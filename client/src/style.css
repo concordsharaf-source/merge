@@ -2257,3 +2257,16 @@ button.pd-mini { cursor:pointer; }
 .periodic-inventory-row__icon { border-radius:11px; }
 .stitch-dialog .report-export-options .button { border-radius:14px; }
 .stitch-dialog .periodic-inventory-detail>div:not(.periodic-inventory-detail__comparison) { border-radius:12px; }
+
+/* ===== Stitch settings (الدفعة 9) ===== */
+.settings-page .report-toggle { background:var(--color-surface-container-lowest); border-color:var(--color-outline-variant); border-radius:16px; }
+.settings-page .report-toggle__icon { width:40px; height:40px; color:var(--color-primary); background:var(--color-surface-container); border-radius:12px; }
+.settings-page .report-toggle__badge { font-weight:800; }
+.settings-hub__intro { border-radius:18px; }
+.account-list .account-row__icon { border-radius:12px; }
+.settings-contact-card { display:grid; gap:6px; padding:18px; border-radius:18px; }
+.settings-contact-card h2 { margin:0; font-size:16px; }
+.settings-contact-card p { margin:0; color:var(--muted); font-size:12px; }
+.settings-contact-card__phone, .settings-contact-card__email { color:var(--green-deep); font-weight:800; font-size:13px; }
+.settings-contact-card small { color:var(--muted); font-size:11px; }
+.stitch-dialog .confirm-dialog { display:grid; gap:4px; }
