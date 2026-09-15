@@ -2154,3 +2154,48 @@ button.pd-mini { cursor:pointer; }
 .stitch-dialog .invoice-detail { font-size:13px; }
 .stitch-dialog .invoice-detail__final strong { font-size:20px; }
 .stitch-dialog .invoice-detail > div { align-items:flex-start; }
+
+/* ===== Stitch customers/suppliers (الدفعة 5) ===== */
+.cs-hero { padding:16px; margin:0 0 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:20px; box-shadow:0 12px 26px rgba(0,81,60,.22); }
+.cs-hero__value { display:grid; gap:2px; }
+.cs-hero__value span { font-size:11px; font-weight:700; opacity:.85; }
+.cs-hero__value strong { font-size:26px; font-variant-numeric:tabular-nums; }
+.cs-hero__minis { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.cs-mini { display:grid; gap:2px; padding:10px 12px; color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:14px; text-align:right; }
+.cs-mini span { font-size:10px; font-weight:700; opacity:.85; }
+.cs-mini strong { font-size:15px; font-variant-numeric:tabular-nums; }
+.cs-cta { margin:0 0 12px; }
+.cs-cta .button { width:100%; min-height:52px; border-radius:14px; font-size:14px; }
+.cs-chips { display:flex; gap:8px; margin:12px 0 4px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.cs-chips::-webkit-scrollbar { display:none; }
+.cs-chip { flex:0 0 auto; min-height:34px; padding:0 16px; color:var(--color-on-surface-variant); background:var(--color-surface-container-high); border:1px solid transparent; border-radius:999px; font-size:12px; font-weight:800; }
+.cs-chip.is-active { color:#fff; background:var(--color-primary); box-shadow:0 4px 12px rgba(0,99,70,.28); }
+.cs-chip--over.is-active { background:#c42a47; box-shadow:0 4px 12px rgba(196,42,71,.28); }
+.entity-list .cs-card { display:block; padding:12px; margin:12px 0; background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:18px; box-shadow:var(--shadow-soft); }
+.cs-card__top { display:flex; gap:10px; min-width:0; }
+.cs-avatar { display:grid; place-items:center; flex:0 0 52px; width:52px; height:52px; color:var(--color-primary); background:var(--color-surface-container); border-radius:14px; font-size:20px; font-weight:800; }
+.cs-card__head { flex:1 1 auto; min-width:0; }
+.cs-card__title { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.cs-card__title strong { font-size:14px; line-height:1.5; overflow-wrap:anywhere; }
+.cs-status { flex:0 0 auto; padding:3px 12px; border-radius:999px; font-size:10px; font-weight:800; }
+.cs-status--debtor, .cs-status--due { color:#8a4b00; background:#ffe7c2; }
+.cs-status--settled { color:#0b5c40; background:#d9f2e3; }
+.cs-status--over { color:#fff; background:#c42a47; }
+[data-theme="dark"] .cs-status--debtor, [data-theme="dark"] .cs-status--due { color:#ffcf8a; background:#4a2f10; }
+[data-theme="dark"] .cs-status--settled { color:#7bd8aa; background:#14402d; }
+.cs-card__meta { display:block; margin-top:2px; color:var(--color-on-surface-variant); font-size:10px; }
+.cs-balance { flex:0 0 auto; display:grid; gap:2px; text-align:left; }
+.cs-balance span { color:var(--color-on-surface-variant); font-size:9px; font-weight:700; }
+.cs-balance strong { font-size:17px; font-variant-numeric:tabular-nums; }
+.cs-card--debtor .cs-balance strong, .cs-card--due .cs-balance strong, .cs-card--over .cs-balance strong { color:var(--danger); }
+.cs-card--settled .cs-balance strong { color:#187247; }
+[data-theme="dark"] .cs-card--settled .cs-balance strong { color:#7bd8aa; }
+.cs-last { display:block; margin-top:8px; padding-top:8px; border-top:1px dashed var(--color-outline-variant); color:var(--color-on-surface-variant); font-size:10px; }
+.cs-card__actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.cs-card__actions .button { flex:1 1 120px; min-height:44px; border-radius:12px; font-size:12px; }
+.cs-icons { display:flex; gap:6px; }
+.cs-icons .icon-button { flex:0 0 44px; width:44px; min-height:44px; border:1px solid var(--color-outline-variant); border-radius:12px; }
+.stitch-dialog .account-summary > div { border-radius:14px; }
+.stitch-dialog .account-transaction { border-radius:12px; }
+.stitch-dialog .payment-receipt__highlight { border-radius:12px; }
+.stitch-dialog .payment-receipt__badge { border-radius:12px; }
