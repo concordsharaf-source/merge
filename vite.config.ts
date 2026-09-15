@@ -171,6 +171,7 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [
+      ".e2b.app",
       ".manuspre.computer",
       ".manus.computer",
       ".manus-asia.computer",
