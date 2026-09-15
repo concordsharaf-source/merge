@@ -2297,3 +2297,4 @@ button.pd-mini { cursor:pointer; }
 /* ===== Stitch final sweep (الدفعة 10) ===== */
 .held-invoices-list .held-icon { border-radius:12px; }
 .stitch-dialog .import-choice-button { border-radius:14px; }
+.build-stamp { display:block; margin-top:8px; color:var(--muted); font-size:10px; text-align:center; }
