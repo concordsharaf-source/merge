@@ -2537,3 +2537,35 @@ button.pd-mini { cursor:pointer; }
 .entry-setup .login-recovery-link { justify-self:center; }
 .entry-setup .account-hints { display:grid; gap:8px; }
 .entry-setup .build-stamp { text-align:center; }
+
+/* ===== B17: سلة pos_2 المفصلة + سلة pos_1 الشريطية + اختيار الشكل ===== */
+.cart-title-row { align-items:center; }
+.cart-title { display:inline-flex; align-items:center; gap:8px; font-size:16px; font-weight:800; }
+.cart-count-badge { padding:2px 10px; border-radius:999px; background:var(--primary); color:#fff; font-size:11px; font-weight:800; white-space:nowrap; }
+.cart-breakdown { display:grid; gap:6px; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:var(--surface-2, rgba(127,127,127,.07)); }
+.cb-row { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:13px; }
+.cb-row strong { font-size:15px; }
+.cb-total { border-top:1px dashed var(--line); padding-top:6px; }
+.cb-total strong { font-size:22px; color:var(--primary); }
+.cb-discount__value { color:var(--danger); }
+.cb-edit { font-size:11px; text-decoration:underline; }
+.cb-discount__field { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12px; color:var(--muted); }
+.cb-discount__field input { width:110px; padding:6px 10px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:inherit; font:inherit; text-align:center; }
+.cart-paytype { display:grid; gap:6px; }
+.cart-paytype__label { font-size:12px; font-weight:800; }
+.cart-paytype__grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:4px; border-radius:12px; background:var(--surface-2, rgba(127,127,127,.1)); }
+.cart-paytype__btn { display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; border:0; border-radius:9px; background:transparent; color:var(--muted); font-weight:800; font-size:13px; cursor:pointer; white-space:nowrap; }
+.cart-paytype__btn.is-cash { background:var(--surface); color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+.cart-panel__head .cart-title-row { width:100%; }
+[data-cart-style="bar"][data-sheet="peek"] .cart-lines { display:none; }
+[data-cart-style="bar"] .cart-title-row { display:none; }
+[data-cart-style="bar"] .cart-line__price, [data-cart-style="bar"] .cart-line__discount-wrap { display:none; }
+.cart-style-segment { display:grid; gap:8px; margin-top:10px; }
+.cart-style-segment__label { font-size:13px; font-weight:800; }
+.cart-style-segment__grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cart-style-segment__btn { display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; border:1px solid var(--line); border-radius:11px; background:var(--surface); color:var(--muted); font-weight:800; font-size:13px; cursor:pointer; }
+.cart-style-segment__btn.is-active { border-color:var(--primary); color:var(--primary); background:color-mix(in srgb, var(--primary) 10%, transparent); }
+[data-theme="dark"] .cart-breakdown { background:rgba(255,255,255,.05); }
+[data-theme="dark"] .cart-paytype__grid { background:rgba(255,255,255,.06); }
+[data-theme="dark"] .cart-paytype__btn.is-cash { background:rgba(255,255,255,.1); }
+[data-theme="dark"] .cb-discount__field input { background:rgba(255,255,255,.06); }
