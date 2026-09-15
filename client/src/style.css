@@ -181,7 +181,7 @@
 
 /* دفتر التاجر الهادئ: حداثة وظيفية دافئة؛ العاجي، أخضر السجل، وتسلسل تشغيلي واضح. */
 /* دفتر التاجر الهادئ: RTL عملي، حقول عربية واضحة، وإطار مسح يدعم الهاتف دون توسع أفقي. */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap");
+/* الخطوط تُحمَّل من index.html عبر link (أسرع من @import) */
 
 :root { --ink:#17342d; --muted:#6a776f; --canvas:#f4f3ec; --paper:#fffefa; --line:#e4e5dc; --green:#1f6b59; --green-deep:#174c3f; --green-pale:#e7f1eb; --gold:#c59a55; --gold-pale:#f8f0df; --danger:#b84845; --danger-pale:#fae9e6; --shadow:0 15px 40px rgba(24, 52, 43, .08); --shadow-soft:0 5px 18px rgba(24, 52, 43, .06); --radius:18px; --ease-out:cubic-bezier(.23,1,.32,1); font-family:"Cairo", sans-serif; color:var(--ink); background:var(--canvas); }
 * { box-sizing:border-box; }
