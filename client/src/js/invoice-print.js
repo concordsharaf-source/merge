@@ -14,6 +14,7 @@ export function renderThermalInvoiceHtml({
   formatDateTime,
   escapeHtml,
   paymentLabel,
+  paperWidthMm = 80,
 }) {
   const rows = invoice.items.map((item) => `<tr>
     <td>${escapeHtml(item.productName)}<br><small>${formatAmount(item.quantity)} ${escapeHtml(item.unit)} × ${formatMoney(item.unitPrice)}</small></td>
@@ -30,6 +31,8 @@ export function renderThermalInvoiceHtml({
     storeInfo?.taxNumber ? `<span>الرقم الضريبي: ${escapeHtml(storeInfo.taxNumber)}</span>` : "",
   ].filter(Boolean).join(" · ");
 
+  const paper = paperWidthMm === 58 ? "58mm" : "80mm";
+  const paperBody = paperWidthMm === 58 ? "50mm" : "72mm";
   return `<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -38,10 +41,10 @@ export function renderThermalInvoiceHtml({
   <title>${escapeHtml(invoice.invoiceNumber)}</title>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap");
-    @page{size:80mm auto;margin:4mm}
+    @page{size:${paper} auto;margin:4mm}
     *, *::before, *::after{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
     body{
-      width:72mm;
+      width:${paperBody};
       margin:0 auto;
       color:#111;
       font-family:"HesabiArabicPdf","Noto Naskh Arabic","Cairo",Tahoma,Arial,sans-serif;

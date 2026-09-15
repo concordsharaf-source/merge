@@ -452,12 +452,21 @@ function expiryStatusMarkup(product) {
 }
 function expiryMeterMarkup(product) { const progress = expiryProgress({ productionDate: product?.nearestProductionDate, expiryDate: product?.nearestExpiryDate }); if (!progress) return `<div class="expiry-meter expiry-meter--empty" title="لا توجد تواريخ إنتاج وانتهاء مكتملة"><span></span></div>`; const consumed = Math.max(0, Math.min(1, progress.ratio)); const remaining = 1 - consumed; const tone = consumed >= 1 ? "danger" : consumed >= 0.85 ? "warning" : "safe"; return `<div class="expiry-meter expiry-meter--${tone}" title="المتبقي ${Math.round(remaining * 100)}% من مدة الصلاحية"><span style="width:${Math.round(remaining * 100)}%"></span></div>`; }
 
+async function estimateStorageUsage() {
+  try {
+    const estimate = await navigator.storage?.estimate?.();
+    if (!estimate || typeof estimate.usage !== "number") return null;
+    return { usage: estimate.usage, quota: estimate.quota || 0 };
+  } catch { return null; }
+}
+
 async function refresh() {
   [state.products, state.productSuppliers, state.sales, state.saleItems, state.suppliers, state.supplierPayments, state.customers, state.customerPayments, state.purchases, state.purchaseItems, state.expenses, state.stockMovements, state.cashMovements, state.transferVaultDeposits, state.cashbox, state.dashboard, state.cashierShifts, state.cashierSalarySummaries, state.cashierMonthlySalaryExpenses, state.cashierShiftStatistics, state.vault, state.periodicInventories] = await Promise.all([db.listProducts(), db.listProductSupplierLinks(), db.listSales(), db.listSaleItems(), db.listSuppliers(), db.listSupplierPayments(), db.listCustomers(), db.listCustomerPayments(), db.listPurchases(), db.listPurchaseItems(), db.listExpenses(), db.listStockMovements(), db.listCashMovements({ from: state.cashFrom, to: state.cashTo }), db.listTransferVaultDeposits(), db.getCashbox({ from: state.cashFrom, to: state.cashTo }), db.getDashboard(), db.listCashierShifts({ date: "" }), db.listCashierSalarySummaries(), db.listCashierMonthlySalaryExpenses({ from: state.expenseFrom, to: state.expenseTo }), db.listCashierShiftStatistics({ from: state.cashFrom, to: state.cashTo }), db.getVault({ from: state.cashFrom, to: state.cashTo }), db.listPeriodicInventories()]);
   state.activeCashierShift = state.currentUser?.role === "cashier" ? await db.getActiveCashierShift(state.currentUser.id) : null;
   void syncNotificationAlerts();
   const auditRange = currentPeriodicInventoryRange();
   [state.analytics, state.periodicInventorySummary] = await Promise.all([db.getAnalytics({ from: state.reportFrom, to: state.reportTo }), db.getPeriodicInventorySummary(auditRange)]);
+  state.storageUsage = await estimateStorageUsage();
   state.todayTransfers = calculateTransferCollections({ sales: state.sales.filter((sale) => dateKey(sale.date) === dateKey()), customerPayments: state.customerPayments.filter((payment) => dateKey(payment.date) === dateKey()) });
 }
 
@@ -491,7 +500,8 @@ function navMarkup() {
   const accessibleItems = NAV_ITEMS.filter((item) => canAccessView(state.currentUser, item.id));
   const renderItems = (items) => items.map((item) => `<button class="nav-item ${state.view === item.id ? "is-active" : ""}" data-action="navigate" data-view="${item.id}" ${state.view === item.id ? 'aria-current="page"' : ""} title="${item.label}">${msymbol(NAV_MSYMBOL[item.id] || "dashboard")}<span>${item.label}</span></button>`).join("");
   const configuredOrder = normalizedMobileNavigationOrder(state.settings?.mobileNavigationOrder);
-  const bottomItems = configuredOrder.map((id) => accessibleItems.find((item) => item.id === id)).filter(Boolean);
+  const hiddenNavIds = new Set(state.settings?.hiddenMobileNav || []);
+  const bottomItems = configuredOrder.map((id) => accessibleItems.find((item) => item.id === id)).filter(Boolean).filter((item) => !hiddenNavIds.has(item.id));
   const items = renderItems(accessibleItems);
   return `<aside class="sidebar">
     <div class="flex items-center gap-3 px-2 pt-1 pb-7"><img src="${brandLogoUrl()}" alt="شعار ${escapeHtml(state.settings?.storeName || "المتجر")}" class="w-10 h-10 object-contain shrink-0" /><div class="min-w-0"><strong class="font-headline-sm text-headline-sm text-on-surface block leading-tight">حسابي</strong><small class="font-label-sm text-label-sm text-on-surface-variant block truncate">${escapeHtml(state.settings?.storeName || "متجرك")}</small></div></div>
@@ -502,11 +512,9 @@ function navMarkup() {
   <nav class="bottom-nav" data-bottom-nav aria-label="التنقل الرئيسي">${renderItems(bottomItems)}</nav>`;
 }
 
-/* الرأس العام اللاصق (Stitch): شعار المتجر + الحالة + البحث + المظهر + الماسح + الحساب. */
+/* الرأس العام اللاصق (Stitch): شعار المتجر + الحالة + البحث + الحساب. */
 function appHeaderMarkup() {
-  const themeGlyph = resolvedTheme() === "dark" ? "light_mode" : "dark_mode";
-  const themeLabel = themePreference() === "system" ? `يتبع ضبط الجهاز (${systemPrefersDark() ? "داكن" : "فاتح"}) — اضغط للوضع الفاتح` : themePreference() === "light" ? "الوضع الفاتح — اضغط للوضع الداكن" : "الوضع الداكن — اضغط لاتباع ضبط الجهاز";
-  return `<header class="app-header bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0 flex-1"><img src="${brandLogoUrl()}" alt="حسابي" class="h-8 w-auto object-contain shrink-0" /><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate leading-none">${escapeHtml(storeDisplayName())}</span><span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm inline-flex items-center gap-1 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>متصل محلياً</span></div><span class="font-label-sm text-label-sm text-on-surface-variant truncate">حسابي • ${escapeHtml(viewLabel(state.view))}</span></div></div><div class="flex items-center gap-1 shrink-0"><button aria-label="ابحث في التطبيق" title="ابحث في التطبيق" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container transition-colors" data-action="open-app-search" type="button">${msymbol("search", "text-[20px]")}</button><button aria-label="${themeLabel}" title="${themeLabel}" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container transition-colors" data-action="toggle-theme" type="button">${msymbol(themeGlyph, "text-[20px]")}</button><button aria-label="مسح باركود السلعة" title="مسح باركود السلعة" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-primary active:bg-surface-container transition-colors" data-action="open-sales-scanner" data-mode="sale" type="button">${msymbol("barcode_scanner", "text-[22px]")}</button><button aria-label="تبديل المستخدمين أو تسجيل الخروج" title="تبديل المستخدمين أو تسجيل الخروج" class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 active:scale-95 transition-transform" data-action="account-session" type="button">${msymbol("person", "text-[18px]")}</button></div></div></header>`;
+  return `<header class="app-header bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0 flex-1"><img src="${brandLogoUrl()}" alt="حسابي" class="h-8 w-auto object-contain shrink-0" /><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm text-on-surface font-bold truncate leading-none">${escapeHtml(storeDisplayName())}</span><span class="px-space-xs py-0.5 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm inline-flex items-center gap-1 shrink-0"><span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>متصل محلياً</span></div><span class="font-label-sm text-label-sm text-on-surface-variant truncate">حسابي • ${escapeHtml(viewLabel(state.view))}</span></div></div><div class="flex items-center gap-1 shrink-0"><button aria-label="ابحث في التطبيق" title="ابحث في التطبيق" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container transition-colors" data-action="open-app-search" type="button">${msymbol("search", "text-[20px]")}</button><button aria-label="تبديل المستخدمين أو تسجيل الخروج" title="تبديل المستخدمين أو تسجيل الخروج" class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center shrink-0 active:scale-95 transition-transform" data-action="account-session" type="button">${msymbol("person", "text-[18px]")}</button></div></div></header>`;
 }
 function normalizedMobileNavigationOrder(order = []) {
   const knownIds = new Set(NAV_ITEMS.map((item) => item.id));
@@ -527,7 +535,7 @@ async function updateMobileNavigationOrder(id, direction = 0) {
 }
 
 async function resetMobileNavigationOrder() {
-  await db.saveSettings({ mobileNavigationOrder: DEFAULT_MOBILE_NAVIGATION_ORDER });
+  await db.saveSettings({ mobileNavigationOrder: DEFAULT_MOBILE_NAVIGATION_ORDER, hiddenMobileNav: [] });
   state.settings = await db.getSettings();
   render();
   showToast("تمت استعادة ترتيب شريط الهاتف الافتراضي.");
@@ -2046,12 +2054,23 @@ function cloudBackupMarkup() {
 function mobileNavigationSettingsMarkup() {
   const order = normalizedMobileNavigationOrder(state.settings?.mobileNavigationOrder);
   const byId = new Map(NAV_ITEMS.map((item) => [item.id, item]));
-  return `<section class="panel mobile-nav-settings"><div class="panel__head"><div><span class="eyebrow">شريط الهاتف</span><h2>ترتيب الأيقونات</h2></div></div><p>غيّر الأولوية لكل محل من هنا. الترتيب يحفظ على هذا الجهاز، ويظهر للكاشير بالأقسام المسموح له بها فقط.</p><div class="mobile-nav-settings__list">${order.map((id, index) => { const item = byId.get(id); return `<article class="mobile-nav-settings__item"><span class="mobile-nav-settings__icon">${icon(item.icon, 18)}</span><strong>${escapeHtml(item.label)}</strong><div class="mobile-nav-settings__actions"><button class="icon-button" type="button" data-action="move-mobile-nav" data-id="${id}" data-direction="-1" aria-label="تقديم ${escapeHtml(item.label)}" title="تقديم" ${index === 0 ? "disabled" : ""}>${msymbol("arrow_upward", "text-[18px]")}</button><button class="icon-button mobile-nav-settings__down" type="button" data-action="move-mobile-nav" data-id="${id}" data-direction="1" aria-label="تأخير ${escapeHtml(item.label)}" title="تأخير" ${index === order.length - 1 ? "disabled" : ""}>${msymbol("arrow_downward", "text-[18px]")}</button></div></article>`; }).join("")}</div><div class="dialog__actions"><button class="button button--secondary" type="button" data-action="reset-mobile-nav">استعادة الترتيب الافتراضي</button></div></section>`;
+  const hiddenNav = new Set(state.settings?.hiddenMobileNav || []);
+  const visibleOrder = order.filter((id) => !hiddenNav.has(id));
+  return `<section class="panel mobile-nav-settings"><div class="panel__head"><div><span class="eyebrow">شريط الهاتف</span><h2>ترتيب الأيقونات</h2></div><small class="mobile-nav-settings__count">${amount(visibleOrder.length)} مفعّلة</small></div><p>غيّر الأولوية لكل محل من هنا. الترتيب يحفظ على هذا الجهاز، ويظهر للكاشير بالأقسام المسموح له بها فقط.</p><div class="mobile-nav-settings__list">${order.map((id, index) => { const item = byId.get(id); const isHidden = hiddenNav.has(id); return `<article class="mobile-nav-settings__item ${isHidden ? "is-hidden-tab" : ""}"><span class="mobile-nav-settings__icon">${icon(item.icon, 18)}</span><strong>${escapeHtml(item.label)}</strong><div class="mobile-nav-settings__actions"><button class="icon-button" type="button" data-action="toggle-mobile-nav" data-id="${id}" aria-label="${isHidden ? "إظهار" : "إخفاء"} ${escapeHtml(item.label)}" title="${isHidden ? "إظهار" : "إخفاء"}">${msymbol(isHidden ? "visibility_off" : "visibility", "text-[18px]")}</button><button class="icon-button" type="button" data-action="move-mobile-nav" data-id="${id}" data-direction="-1" aria-label="تقديم ${escapeHtml(item.label)}" title="تقديم" ${index === 0 ? "disabled" : ""}>${msymbol("arrow_upward", "text-[18px]")}</button><button class="icon-button mobile-nav-settings__down" type="button" data-action="move-mobile-nav" data-id="${id}" data-direction="1" aria-label="تأخير ${escapeHtml(item.label)}" title="تأخير" ${index === order.length - 1 ? "disabled" : ""}>${msymbol("arrow_downward", "text-[18px]")}</button></div></article>`; }).join("")}</div><div class="mobile-nav-preview"><small>معاينة حية للشريط السفلي (اسحب أفقيًا)</small><div class="mobile-nav-preview__strip">${visibleOrder.map((entry) => { const visible = byId.get(entry); return visible ? `<span>${msymbol(NAV_MSYMBOL[entry] || "dashboard", "text-[18px]")}<i>${escapeHtml(visible.label)}</i></span>` : ""; }).join("")}</div></div><div class="dialog__actions"><button class="button button--secondary" type="button" data-action="reset-mobile-nav">استعادة الافتراضي</button></div></section>`;
+}
+
+function storageMeterMarkup() {
+  const stored = state.storageUsage;
+  if (!stored) return `<small class="field-hint">تعذر قراءة مساحة التخزين على هذا المتصفح.</small>`;
+  const usedMB = stored.usage / 1048576;
+  const quotaMB = stored.quota / 1048576;
+  const percent = stored.quota > 0 ? Math.min(100, Math.round(stored.usage / stored.quota * 100)) : 0;
+  return `<div class="storage-meter"><div class="storage-meter__row"><span>مساحة المتجر المستخدمة</span><strong>${amount(Math.round(usedMB * 10) / 10)} / ${amount(Math.round(quotaMB))} MB</strong></div><div class="storage-meter__bar"><i style="width:${percent}%"></i></div><small class="field-hint">استهلاك ${amount(percent)}% فقط — البيانات محلية على IndexedDB.</small></div>`;
 }
 
 function dataManagementMarkup() {
   return `${topbarMarkup("إدارة البيانات", "احفظ نسخة محلية أو سحابية واستعدها عند الحاجة، دون مزامنة تلقائية بين الأجهزة.", `<button class="button button--secondary" data-action="navigate" data-view="settings">${icon("arrow", 17)}<span>الإعدادات</span></button>`)}
-  <div class="data-management-page"><section class="panel barcode-tools"><div class="panel__head"><div><span class="eyebrow">كتالوج الباركود</span><h2>استيراد أو تصدير الباركودات</h2></div></div><p>صدّر منتجاتك إلى Excel، أو استورد ملف Excel/CSV/TSV. تُطابق الأعمدة العربية أو الإنجليزية تلقائيًا وتظهر المنتجات والباركودات فورًا في القوائم.</p><div class="dialog__actions"><button class="button button--secondary" type="button" data-action="export-barcodes">تصدير Excel</button><label class="button button--primary" for="barcode-import-file">استيراد ملف الباركود<input id="barcode-import-file" type="file" accept=".xlsx,.xls,.csv,.tsv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden /></label></div><small class="field-hint">يفضل أن يحتوي الملف على عمود «الباركود» و«اسم المنتج». إذا كان المنتج موجودًا سيتم تحديث باركوده، وإذا لم يكن موجودًا سيُضاف إلى المنتجات.</small></section><section class="report-grid"><section class="panel report-card data-management-card"><span class="eyebrow">نسخة محلية</span><h2>تصدير واستيراد البيانات</h2><p>صدّر ملف JSON يحتفظ بكل بيانات هذا الجهاز، واستعده فقط من ملف حسابي موثوق.</p>${state.settings?.localBackupDirectoryName ? `<small class="field-hint">الحفظ التلقائي في: ${escapeHtml(state.settings.localBackupDirectoryName)}</small>` : `<small class="field-hint">اختر مجلدًا ليُحفظ فيه النسخ اليومية تلقائيًا على سطح المكتب.</small>`}<div class="dialog__actions"><button class="button button--primary" data-action="export-backup">${msymbol("download", "text-[18px]")} تصدير نسخة</button><button class="button button--secondary" data-action="choose-backup-directory">${msymbol("folder_open", "text-[18px]")} اختيار مجلد الحفظ</button><label class="button button--primary" for="restore-file">${msymbol("upload", "text-[18px]")} استيراد واستعادة</label><input id="restore-file" type="file" accept="application/json,.json" hidden /></div></section>${cloudBackupMarkup()}<section class="panel report-card data-management-card data-management-card--danger"><span class="eyebrow">منطقة حساسة</span><h2>مسح البيانات</h2><p>يمسح كل بيانات هذا الجهاز ويعيد التطبيق إلى شاشة الإعداد. صدّر نسخة احتياطية أولًا.</p><button class="button button--danger" data-action="reset-data">مسح جميع البيانات</button></section></section></div>`;
+  <div class="data-management-page"><section class="panel barcode-tools"><div class="panel__head"><div><span class="eyebrow">كتالوج الباركود</span><h2>استيراد أو تصدير الباركودات</h2></div></div><p>صدّر منتجاتك إلى Excel، أو استورد ملف Excel/CSV/TSV. تُطابق الأعمدة العربية أو الإنجليزية تلقائيًا وتظهر المنتجات والباركودات فورًا في القوائم.</p><div class="dialog__actions"><button class="button button--secondary" type="button" data-action="export-barcodes">تصدير Excel</button><label class="button button--primary" for="barcode-import-file">استيراد ملف الباركود<input id="barcode-import-file" type="file" accept=".xlsx,.xls,.csv,.tsv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" hidden /></label></div><small class="field-hint">يفضل أن يحتوي الملف على عمود «الباركود» و«اسم المنتج». إذا كان المنتج موجودًا سيتم تحديث باركوده، وإذا لم يكن موجودًا سيُضاف إلى المنتجات.</small></section><section class="report-grid"><section class="panel report-card data-management-card"><span class="eyebrow">نسخة محلية</span><h2>تصدير واستيراد البيانات</h2><p>صدّر ملف JSON يحتفظ بكل بيانات هذا الجهاز، واستعده فقط من ملف حسابي موثوق.</p>${storageMeterMarkup()}${state.settings?.localBackupDirectoryName ? `<small class="field-hint">الحفظ التلقائي في: ${escapeHtml(state.settings.localBackupDirectoryName)}</small>` : `<small class="field-hint">اختر مجلدًا ليُحفظ فيه النسخ اليومية تلقائيًا على سطح المكتب.</small>`}<div class="dialog__actions"><button class="button button--primary" data-action="export-backup">${msymbol("download", "text-[18px]")} تصدير نسخة</button><button class="button button--secondary" data-action="choose-backup-directory">${msymbol("folder_open", "text-[18px]")} اختيار مجلد الحفظ</button><label class="button button--primary" for="restore-file">${msymbol("upload", "text-[18px]")} استيراد واستعادة</label><input id="restore-file" type="file" accept="application/json,.json" hidden /></div></section>${cloudBackupMarkup()}<section class="panel report-card data-management-card data-management-card--danger"><span class="eyebrow">منطقة حساسة</span><h2>مسح البيانات</h2><p>يمسح كل بيانات هذا الجهاز ويعيد التطبيق إلى شاشة الإعداد. صدّر نسخة احتياطية أولًا.</p><button class="button button--danger" data-action="reset-data">مسح جميع البيانات</button></section></section><section class="panel encryption-note"><div class="encryption-note__icon">${msymbol("lock_person", "text-[22px]")}</div><p>جميع النسخ الاحتياطية السحابية والمحلية مشفرة بالكامل. لا يمكن لأي طرف الاطلاع على كشوفات حسابات عملائك أو هوامش أرباح متجرك.</p></section></div>`;
 }
 
 function storeLogoSettingsMarkup() {
@@ -2109,7 +2128,7 @@ function settingsMarkup() {
   ];
   const panels = sections.map((section) => collapsiblePanel(section.key, { eyebrow: section.eyebrow, title: section.title, subtitle: section.subtitle, glyph: section.glyph, badge: section.badge }, state.reportPanels?.[section.key] ? section.body() : "")).join("");
   return `${topbarMarkup("مركز الإعدادات", "اضغط على أي قسم لفتحه، واضغط مرة أخرى لطيه. تبقى بيانات متجرك محلية، ولا تظهر هذه الأدوات للكاشير.")}
-  <div class="settings-page settings-hub"><section class="panel settings-session-card"><div class="settings-session-card__icon">${msymbol("admin_panel_settings", "text-[24px]")}</div><div class="settings-session-card__main"><span class="eyebrow">${escapeHtml(roleLabel(state.currentUser?.role))}</span><h2>${escapeHtml(state.currentUser?.name || "المدير")}</h2><small>المستخدم: ${escapeHtml(state.currentUser?.username || "admin")} · جلسة محلية نشطة</small></div><button class="button button--secondary" data-action="account-session">${msymbol("group", "text-[18px]")}<span>الحساب الحالي</span></button></section>${panels}<section class="panel settings-appearance-card"><div class="panel__head"><div><span class="eyebrow">تفضيلات الواجهة</span><h2>مظهر التطبيق</h2></div></div><div class="theme-segment">${themeBtn("system", "monitor", "يتبع الجهاز")}${themeBtn("light", "light_mode", "فاتح")}${themeBtn("dark", "dark_mode", "داكن")}</div><small class="field-hint">يُحفظ التفضيل محليًا ويُطبق فورًا.</small></section><section class="panel settings-scanner-card"><div class="panel__head"><div><span class="eyebrow">الماسح والكاميرا</span><h2>كاميرا مسح الباركود</h2></div></div><p>الكاميرا الحالية: <strong>${escapeHtml(cameraLabel)}</strong></p><div class="dialog__actions"><button class="button button--primary" data-action="select-camera">${msymbol("videocam", "text-[19px]")}<span>اختيار الكاميرا</span></button></div></section>${notificationsPanelMarkup()}${settingsContactMarkup()}</div>`;
+  <div class="settings-page settings-hub"><section class="panel settings-session-card"><div class="settings-session-card__icon">${msymbol("admin_panel_settings", "text-[24px]")}</div><div class="settings-session-card__main"><span class="eyebrow">${escapeHtml(roleLabel(state.currentUser?.role))}</span><h2>${escapeHtml(state.currentUser?.name || "المدير")}</h2><small>المستخدم: ${escapeHtml(state.currentUser?.username || "admin")} · جلسة محلية نشطة</small></div><button class="button button--secondary" data-action="account-session">${msymbol("group", "text-[18px]")}<span>الحساب الحالي</span></button></section>${panels}<section class="panel settings-appearance-card"><div class="panel__head"><div><span class="eyebrow">تفضيلات الواجهة</span><h2>مظهر التطبيق</h2></div></div><div class="theme-segment">${themeBtn("system", "monitor", "يتبع الجهاز")}${themeBtn("light", "light_mode", "فاتح")}${themeBtn("dark", "dark_mode", "داكن")}</div><small class="field-hint">يُحفظ التفضيل محليًا ويُطبق فورًا.</small></section><section class="panel settings-scanner-card"><div class="panel__head"><div><span class="eyebrow">الماسح والكاميرا</span><h2>كاميرا مسح الباركود</h2></div></div><p>الكاميرا الحالية: <strong>${escapeHtml(cameraLabel)}</strong></p><div class="dialog__actions"><button class="button button--primary" data-action="select-camera">${msymbol("videocam", "text-[19px]")}<span>اختيار الكاميرا</span></button></div><button class="beep-toggle ${state.settings?.scanBeep === false ? "" : "is-on"}" type="button" data-action="toggle-scan-beep"><span class="beep-toggle__label">${msymbol("volume_up", "text-[19px]")}<span>صفارة تأكيد المسح (Beep)</span></span><span class="beep-toggle__state">${state.settings?.scanBeep === false ? "مكتومة" : "مُفعّلة"}</span></button></section><section class="panel settings-printer-card"><div class="panel__head"><div><span class="eyebrow">ملحقات الكاشير</span><h2>طابعة الفواتير الحرارية</h2></div></div><div class="paper-segment" role="group" aria-label="عرض ورق الطابعة"><button type="button" class="paper-segment__btn ${(state.settings?.thermalPaperWidth || "80") === "58" ? "is-active" : ""}" data-action="set-paper-width" data-width="58">${msymbol("receipt", "text-[18px]")}<span>ورق 58mm (صغير)</span></button><button type="button" class="paper-segment__btn ${(state.settings?.thermalPaperWidth || "80") === "80" ? "is-active" : ""}" data-action="set-paper-width" data-width="80">${msymbol("receipt_long", "text-[18px]")}<span>ورق 80mm (قياسي)</span></button></div><small class="field-hint">يُستخدم العرض المختار عند الطباعة الحرارية المباشرة.</small><label class="printer-name-field">الطابعة المقترنة<input id="printer-name-input" dir="rtl" autocomplete="off" placeholder="مثال: MPT-II Bluetooth" value="${escapeHtml(state.settings?.printerName || "")}" /></label><div class="dialog__actions"><button class="button button--secondary" data-action="save-printer-name">${msymbol("save", "text-[18px]")}<span>حفظ الاسم</span></button><button class="button button--primary" data-action="test-thermal-print">${msymbol("print", "text-[18px]")}<span>فحص وتجربة</span></button></div></section>${notificationsPanelMarkup()}${settingsContactMarkup()}</div>`;
 }
 
 
@@ -2677,6 +2696,11 @@ async function handleActionUnsafe(event) {
   if (action === "reset-notification-history") { clearNotificationHistory(); showToast("أُعيد ضبط سجل التكرار. ستصلك التنبيهات من جديد."); void syncNotificationAlerts(); return; }
   if (action === "toggle-theme") { toggleTheme(); return; }
   if (action === "set-theme") { setThemePreference(event.currentTarget.dataset.theme); return; }
+  if (action === "set-paper-width") { setThermalPaperWidth(event.currentTarget.dataset.width); return; }
+  if (action === "save-printer-name") { savePrinterName(); return; }
+  if (action === "test-thermal-print") { testThermalPrint(); return; }
+  if (action === "toggle-scan-beep") { toggleScanBeep(); return; }
+  if (action === "toggle-mobile-nav") { toggleMobileNavVisibility(id); return; }
   if (action === "select-camera") { openCameraSelectDialog(); return; }
   if (action === "quick-lock") { openScreenLockDialog(); return; }
   if (action === "toggle-report-panel") { const key = event.currentTarget.dataset.panel; if (!state.reportPanels) state.reportPanels = {}; state.reportPanels[key] = !state.reportPanels[key]; renderKeepingScroll(); return; }
@@ -2742,7 +2766,7 @@ async function handleActionUnsafe(event) {
   if (action === "cloud-upload-backup") { uploadCurrentCloudBackup(); return; }
   if (action === "cloud-refresh-backups") { refreshCloudBackups(); return; }
   if (action === "repair-cloud-workspace") { repairCloudWorkspace(); return; }
-  if (action === "cloud-restore-backup") { restoreCloudBackup(id); return; }
+  if (action === "cloud-restore-backup") { openCloudRestoreConfirmDialog(id); return; }
   if (action === "cloud-delete-backup") { removeCloudBackup(id); return; }
   if (action === "cloud-signout") { disconnectCloudBackup(); return; }
   if (action === "export-report") { openReportExportDialog(); return; }
@@ -3403,8 +3427,13 @@ async function uploadCurrentCloudBackup() {
   finally { state.cloud.busy = ""; if (state.view === "settings") render(); }
 }
 
+function openCloudRestoreConfirmDialog(backupId) {
+  const backup = (state.cloud?.backups || []).find((entry) => entry.id === backupId);
+  const overlay = openDialog(`<div class="cloud-restore-confirm"><div class="dialog__head"><div><span class="eyebrow">إجراء أمني وقائي إلزامي</span><h2>تأكيد استعادة النسخة السحابية</h2></div><button class="icon-button" data-dialog-close aria-label="إغلاق">${msymbol("close", "text-[20px]")}</button></div><div class="cloud-restore-confirm__warn">${msymbol("warning", "text-[22px]")}<p>سيتم استبدال كامل بيانات التطبيق الحالية بهذه النسخة السحابية. لحماية عملياتك الأخيرة، سننزّل تلقائيًا <strong>نسخة وقائية محلية (JSON)</strong> قبل بدء الاستعادة.</p></div>${backup ? `<div class="cloud-restore-confirm__meta"><div><span>المتجر</span><strong>${escapeHtml(backup.storeName || "حسابي")}</strong></div><div><span>التاريخ</span><strong>${dateTime(backup.createdAtClient)}</strong></div><div><span>الحجم</span><strong>${cloudBytes(backup.encodedBytes)}</strong></div><div><span>المعرف</span><strong dir="ltr">${escapeHtml(String(backup.id || "").slice(0, 12))}…</strong></div></div>` : ""}<div class="dialog__actions"><button class="button button--secondary" data-dialog-close>رجوع</button><button id="confirm-cloud-restore" class="button button--primary">تأكيد الاستعادة ${msymbol("settings_backup_restore", "text-[19px]")}</button></div></div>`);
+  overlay.querySelector("#confirm-cloud-restore").addEventListener("click", () => { closeDialog(); restoreCloudBackup(backupId); });
+}
+
 async function restoreCloudBackup(backupId) {
-  if (!window.confirm("ستتحقق حسابي من النسخة ثم تستبدل بيانات هذا الجهاز. سيُنزل أولًا ملف JSON وقائيًا محليًا، وستعود إلى شاشة الدخول. هل تريد المتابعة؟")) return;
   state.cloud.busy = "restore"; state.cloud.error = ""; render();
   try {
     const safetyBackup = await db.exportBackup();
@@ -3632,6 +3661,62 @@ async function setThemePreference(theme) {
     applyTheme();
     render();
     showToast(theme === "system" ? `يتبع ضبط الجهاز الآن (${systemPrefersDark() ? "داكن" : "فاتح"})` : theme === "dark" ? "تم تفعيل الوضع الداكن" : "تم تفعيل الوضع الفاتح");
+  } catch (error) { showToast(error.message, "error"); }
+}
+
+async function toggleScanBeep() {
+  try {
+    const enabled = state.settings?.scanBeep === false;
+    await db.saveSettings({ ...state.settings, scanBeep: enabled });
+    state.settings = await db.getSettings();
+    render();
+    if (enabled) playScannerSuccessSound();
+    showToast(enabled ? "تم تفعيل صفارة المسح" : "تم كتم صفارة المسح");
+  } catch (error) { showToast(error.message, "error"); }
+}
+
+async function setThermalPaperWidth(width) {
+  try {
+    if (width !== "58" && width !== "80") return;
+    await db.saveSettings({ ...state.settings, thermalPaperWidth: width });
+    state.settings = await db.getSettings();
+    render();
+    showToast(`ورق الطباعة الحرارية: ${width}mm`);
+  } catch (error) { showToast(error.message, "error"); }
+}
+
+async function savePrinterName() {
+  try {
+    const input = document.querySelector("#printer-name-input");
+    await db.saveSettings({ ...state.settings, printerName: input?.value?.trim() || "" });
+    state.settings = await db.getSettings();
+    render();
+    showToast("تم حفظ اسم الطابعة");
+  } catch (error) { showToast(error.message, "error"); }
+}
+
+async function testThermalPrint() {
+  try {
+    const width = state.settings?.thermalPaperWidth === "58" ? "58" : "80";
+    const bodyWidth = width === "58" ? "50mm" : "72mm";
+    const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تجربة الطابعة</title><style>@page{size:${width}mm auto;margin:4mm}body{width:${bodyWidth};margin:0 auto;font-family:"Cairo",Tahoma,sans-serif;text-align:center;color:#111}h1{font-size:16px;margin:6px 0}hr{border:0;border-top:1px dashed #999;margin:8px 0}table{width:100%;font-size:12px;border-collapse:collapse}td{padding:3px 0}.t{text-align:right}.n{text-align:left;direction:ltr}</style></head><body><h1>${escapeHtml(storeDisplayName())}</h1><div>تجربة طابعة حرارية · ورق ${width}mm</div><div>${escapeHtml(state.settings?.printerName || "بدون اسم محفوظ")} · ${dateTime(new Date().toISOString())}</div><hr><table><tr><td class="t">صنف تجريبي × 2</td><td class="n">100.00</td></tr><tr><td class="t"><strong>الإجمالي</strong></td><td class="n"><strong>100.00</strong></td></tr></table><hr><div>إذا ظهرت هذه الصفحة بمقاس الورق الصحيح فالطابعة جاهزة.</div></body></html>`;
+    if (!printHtmlDocument({ html, target: "hesabi-thermal-test", features: "width=420,height=720" })) showToast("السماح بالنوافذ المنبثقة مطلوب للطباعة الحرارية.", "error");
+  } catch (error) { showToast(error.message, "error"); }
+}
+
+async function toggleMobileNavVisibility(id) {
+  const order = normalizedMobileNavigationOrder(state.settings?.mobileNavigationOrder);
+  const hidden = new Set(state.settings?.hiddenMobileNav || []);
+  if (hidden.has(id)) hidden.delete(id);
+  else {
+    const visibleCount = order.filter((entry) => !hidden.has(entry)).length;
+    if (visibleCount <= 1) { showToast("يجب بقاء قسم واحد ظاهرًا على الأقل في الشريط.", "error"); return; }
+    hidden.add(id);
+  }
+  try {
+    await db.saveSettings({ ...state.settings, hiddenMobileNav: [...hidden] });
+    state.settings = await db.getSettings();
+    render();
   } catch (error) { showToast(error.message, "error"); }
 }
 
@@ -4028,7 +4113,7 @@ async function shareInvoice(invoice) {
 async function thermalInvoiceHtml(invoice) {
   const customer = invoice.customerId ? state.customers.find((item) => item.id === invoice.customerId) || await db.getCustomer(invoice.customerId) : null;
   const invoiceWithCustomer = customer && !invoice.customerName ? { ...invoice, customerName: customer.name } : invoice;
-  return renderThermalInvoiceHtml({ invoice: invoiceWithCustomer, customer, storeName: storeDisplayName(), storeInfo: state.settings, logoDataUrl: storeLogoDataUrl() || storeLogoUrl(), formatMoney: money, formatAmount: amount, formatDateTime: dateTime, escapeHtml, paymentLabel: paymentChannelLabel(invoice) });
+  return renderThermalInvoiceHtml({ invoice: invoiceWithCustomer, customer, storeName: storeDisplayName(), storeInfo: state.settings, logoDataUrl: storeLogoDataUrl() || storeLogoUrl(), formatMoney: money, formatAmount: amount, formatDateTime: dateTime, escapeHtml, paymentLabel: paymentChannelLabel(invoice), paperWidthMm: Number(state.settings?.thermalPaperWidth) || 80 });
 }
 
 async function printInvoiceThermal(invoice) {
@@ -4408,6 +4493,7 @@ function primeScannerSuccessSound() {
   } catch { /* لا تمنع قيود الصوت بدء الماسح. */ }
 }
 function playScannerSuccessSound() {
+  if (state.settings?.scanBeep === false) return;
   try {
     const context = getScannerSuccessAudioContext();
     if (context) {
