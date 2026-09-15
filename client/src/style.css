@@ -2298,3 +2298,17 @@ button.pd-mini { cursor:pointer; }
 .held-invoices-list .held-icon { border-radius:12px; }
 .stitch-dialog .import-choice-button { border-radius:14px; }
 .build-stamp { display:block; margin-top:8px; color:var(--muted); font-size:10px; text-align:center; }
+
+/* ===== Stitch purchases hero + cards (B11) ===== */
+.pp-hero { padding:16px; margin:0 0 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:20px; box-shadow:0 12px 26px rgba(0,81,60,.22); }
+.pp-hero__value { display:grid; gap:2px; }
+.pp-hero__value span { font-size:11px; font-weight:700; opacity:.85; }
+.pp-hero__value strong { font-size:26px; font-variant-numeric:tabular-nums; }
+.pp-hero__minis { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+.pp-mini { display:grid; gap:2px; padding:10px 12px; color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:14px; }
+.pp-mini span { font-size:10px; font-weight:700; opacity:.85; }
+.pp-mini strong { font-size:14px; font-variant-numeric:tabular-nums; }
+.pp-list { display:grid; gap:10px; padding:0; background:transparent; border:0; box-shadow:none; }
+.pp-list .invoice-row { padding:12px 14px; background:var(--paper); border:1px solid var(--line); border-radius:16px; }
+.pp-list .invoice-row:nth-child(even) { background:var(--paper); border-radius:16px; }
+.pp-list .invoice-row>strong { font-variant-numeric:tabular-nums; }
