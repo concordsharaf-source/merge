@@ -2327,3 +2327,22 @@ button.pd-mini { cursor:pointer; }
 .rp-card__top { display:flex; align-items:center; gap:10px; }
 .rp-card__icon { display:grid; place-items:center; width:40px; height:40px; color:var(--color-primary); background:var(--color-surface-container); border-radius:12px; flex-shrink:0; }
 .rp-cards .report-card h2 { font-variant-numeric:tabular-nums; }
+
+/* ===== Stitch settings mockup + camera (B13) ===== */
+.settings-session-card { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:12px; padding:16px 18px; border-radius:18px; }
+.settings-session-card__icon { display:grid; place-items:center; width:48px; height:48px; color:var(--color-primary); background:var(--color-surface-container); border-radius:14px; }
+.settings-session-card__main { display:grid; gap:2px; min-width:0; }
+.settings-session-card__main h2 { margin:0; font-size:17px; }
+.settings-session-card__main small { color:var(--muted); font-size:11px; }
+@media (max-width:599px) { .settings-session-card { grid-template-columns:auto minmax(0,1fr); } .settings-session-card .button { grid-column:1 / -1; justify-content:center; } }
+.settings-appearance-card, .settings-scanner-card { padding:16px 18px; border-radius:18px; }
+.settings-appearance-card .panel__head, .settings-scanner-card .panel__head { padding:0 0 10px; }
+.theme-segment { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.theme-segment__btn { display:grid; justify-items:center; gap:4px; padding:10px 6px; color:var(--muted); background:transparent; border:1px solid var(--line); border-radius:14px; font-size:11px; font-weight:800; }
+.theme-segment__btn.is-active { color:var(--color-primary); background:var(--color-surface-container); border-color:var(--color-primary); }
+.settings-scanner-card p { margin:0 0 12px; color:var(--muted); font-size:12px; }
+.settings-scanner-card p strong { color:var(--ink); }
+.settings-scanner-card .dialog__actions { margin-top:0; }
+.camera-choices { display:grid; gap:8px; }
+.camera-choice { display:flex; align-items:center; gap:10px; padding:11px 12px; background:var(--color-surface-container-lowest,#fff); border:1px solid var(--line); border-radius:14px; font-size:13px; font-weight:700; cursor:pointer; }
+.camera-choice input { width:18px; height:18px; accent-color:var(--green); }

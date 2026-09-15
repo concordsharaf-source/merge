@@ -747,7 +747,7 @@ function themeToggleMarkup() {
     ? `يتبع ضبط الجهاز (${systemPrefersDark() ? "داكن" : "فاتح"}) — اضغط للوضع الفاتح`
     : preference === "light" ? "الوضع الفاتح — اضغط للوضع الداكن" : "الوضع الداكن — اضغط لاتباع ضبط الجهاز";
   const glyph = preference === "system" ? "monitor" : preference === "light" ? "sun" : "moon";
-  return `<button class="icon-button theme-toggle ${preference === "system" ? "theme-toggle--system" : ""}" data-action="toggle-theme" aria-label="${label}" title="${label}">${icon(glyph, 19)}</button>`;
+  return `<button class="icon-button theme-toggle ${preference === "system" ? "theme-toggle--system" : ""}" data-action="toggle-theme" aria-label="${label}" title="${label}">${msymbol(glyph === "sun" ? "light_mode" : glyph === "moon" ? "dark_mode" : "monitor", "text-[19px]")}</button>`;
 }
 function salesScannerFabMarkup() { return `<button class="sales-scanner-fab" data-action="open-sales-scanner" data-mode="sale" aria-label="مسح بيع فوري" title="بيع ومسح باركود">${msymbol("qr_code_scanner", "")}<span>مسح بيع فوري</span></button>`; }
 
@@ -2068,19 +2068,49 @@ function stripTopbar(markup) {
   return String(markup).replace(/<header class="topbar[\s\S]*?<\/header>/, "");
 }
 
+async function openCameraSelectDialog() {
+  let devices = [];
+  try {
+    const all = await navigator.mediaDevices?.enumerateDevices() || [];
+    devices = all.filter((device) => device.kind === "videoinput");
+  } catch { devices = []; }
+  const current = state.settings?.preferredCameraId || "";
+  const options = devices.length ? devices.map((device, index) => `<label class="camera-choice"><input name="cameraId" type="radio" value="${escapeHtml(device.deviceId)}" ${device.deviceId === current ? "checked" : ""} /><span><strong>${escapeHtml(device.label || `كاميرا ${amount(index + 1)}`)}</strong></span></label>`).join("") : `<p class="inline-empty">لم يتم العثور على كاميرات. اسمح للتطبيق باستخدام الكاميرا من إعدادات المتصفح ثم أعد المحاولة.</p>`;
+  const overlay = openDialog(`<div class="stitch-dialog"><div class="dialog__head"><div><span class="eyebrow">الماسح والكاميرا</span><h2>اختيار كاميرا المسح</h2><p class="dialog__subtext">تُستخدم الكاميرا المختارة عند مسح الباركود. الوضع التلقائي يفضل الكاميرا الخلفية.</p></div><button class="icon-button" data-dialog-close aria-label="إغلاق">${msymbol("close", "text-[20px]")}</button></div><form id="camera-select-form" class="form-grid"><div class="camera-choices form-full"><label class="camera-choice"><input name="cameraId" type="radio" value="" ${!current ? "checked" : ""} /><span><strong>تلقائي (يفضل الخلفية)</strong></span></label>${options}</div><div class="dialog__actions form-full"><button type="button" class="button button--secondary" data-dialog-close>إلغاء</button><button class="button button--primary" type="submit">حفظ الكاميرا ${msymbol("check", "text-[19px]")}</button></div></form></div>`);
+  overlay.querySelectorAll("[data-dialog-close]").forEach((button) => button.addEventListener("click", closeDialog));
+  overlay.querySelector("#camera-select-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      const values = Object.fromEntries(new FormData(event.currentTarget));
+      const cameraId = String(values.cameraId || "");
+      const picked = devices.find((device) => device.deviceId === cameraId);
+      await db.saveSettings({ ...state.settings, preferredCameraId: cameraId, preferredCameraLabel: picked?.label || "" });
+      state.settings = await db.getSettings();
+      closeDialog(); render();
+      showToast(cameraId ? "تم حفظ كاميرا المسح" : "تمت العودة للوضع التلقائي");
+    } catch (error) { showToast(error.message, "error"); }
+  });
+}
+
 function settingsMarkup() {
+  const accounts = state.accounts || [];
+  const todayLogs = (state.activityLogs || []).filter((log) => dateKey(log.date) === dateKey()).length;
+  const preference = themePreference();
+  const themeBtn = (mode, glyph, label) => `<button type="button" class="theme-segment__btn ${preference === mode ? "is-active" : ""}" data-action="set-theme" data-theme="${mode}">${msymbol(glyph, "text-[18px]")}<span>${label}</span></button>`;
+  const cameraLabel = state.settings?.preferredCameraLabel || (state.settings?.preferredCameraId ? "كاميرا مخصصة" : "تلقائي (يفضل الخلفية)");
   const sections = [
     { key: "setGeneral", glyph: "box", eyebrow: "المتجر", title: "إعدادات عامة", subtitle: "الاسم والنشاط والعملة ورصيد البداية", body: () => stripTopbar(generalSettingsMarkup()) },
     { key: "setBrand", glyph: "layers", eyebrow: "الهوية", title: "شعار المتجر", subtitle: "اختر شعارًا محفوظًا محليًا وضمن PDF", body: () => stripTopbar(brandSettingsMarkup()) },
-    { key: "setAccounts", glyph: "users", eyebrow: "الفريق", title: "إدارة الحسابات", subtitle: "أضف الحسابات وحدد الأدوار والرواتب", body: () => stripTopbar(accountsMarkup()) },
-    { key: "setActivity", glyph: "shield", eyebrow: "الأمان والرقابة", title: "سجل العمليات والتدقيق", subtitle: "مراقبة حركات الدخول والمبيعات والمخزون", body: () => stripTopbar(activityLogMarkup()) },
+    { key: "setAccounts", glyph: "users", eyebrow: "الفريق", title: "إدارة الحسابات", subtitle: "أضف الحسابات وحدد الأدوار والرواتب", badge: `${amount(accounts.length)} حساب`, body: () => stripTopbar(accountsMarkup()) },
+    { key: "setActivity", glyph: "shield", eyebrow: "الأمان والرقابة", title: "سجل العمليات والتدقيق", subtitle: "مراقبة حركات الدخول والمبيعات والمخزون", badge: `${amount(todayLogs)} اليوم`, body: () => stripTopbar(activityLogMarkup()) },
     { key: "setNav", glyph: "grid", eyebrow: "الهاتف", title: "ترتيب الأيقونات", subtitle: "غيّر أولوية شريط التنقل حسب متجرِك", body: () => stripTopbar(navigationSettingsMarkup()) },
     { key: "setData", glyph: "restore", eyebrow: "الحفظ", title: "إدارة البيانات", subtitle: "نسخ محلية وسحابية واستعادة آمنة", body: () => stripTopbar(dataManagementMarkup()) },
   ];
-  const panels = sections.map((section) => collapsiblePanel(section.key, { eyebrow: section.eyebrow, title: section.title, subtitle: section.subtitle, glyph: section.glyph }, state.reportPanels?.[section.key] ? section.body() : "")).join("");
+  const panels = sections.map((section) => collapsiblePanel(section.key, { eyebrow: section.eyebrow, title: section.title, subtitle: section.subtitle, glyph: section.glyph, badge: section.badge }, state.reportPanels?.[section.key] ? section.body() : "")).join("");
   return `${topbarMarkup("مركز الإعدادات", "اضغط على أي قسم لفتحه، واضغط مرة أخرى لطيه. تبقى بيانات متجرك محلية، ولا تظهر هذه الأدوات للكاشير.")}
-  <div class="settings-page settings-hub"><section class="settings-hub__intro panel"><span class="eyebrow">لوحة إدارة</span><h2>ضبط المتجر من مكان واحد</h2><p>كل الأقسام مطوية افتراضيًا لتبقى الشاشة مرتبة على الهاتف وسطح المكتب.</p></section>${panels}${notificationsPanelMarkup()}${settingsContactMarkup()}</div>`;
+  <div class="settings-page settings-hub"><section class="panel settings-session-card"><div class="settings-session-card__icon">${msymbol("admin_panel_settings", "text-[24px]")}</div><div class="settings-session-card__main"><span class="eyebrow">${escapeHtml(roleLabel(state.currentUser?.role))}</span><h2>${escapeHtml(state.currentUser?.name || "المدير")}</h2><small>المستخدم: ${escapeHtml(state.currentUser?.username || "admin")} · جلسة محلية نشطة</small></div><button class="button button--secondary" data-action="account-session">${msymbol("group", "text-[18px]")}<span>الحساب الحالي</span></button></section>${panels}<section class="panel settings-appearance-card"><div class="panel__head"><div><span class="eyebrow">تفضيلات الواجهة</span><h2>مظهر التطبيق</h2></div></div><div class="theme-segment">${themeBtn("system", "monitor", "يتبع الجهاز")}${themeBtn("light", "light_mode", "فاتح")}${themeBtn("dark", "dark_mode", "داكن")}</div><small class="field-hint">يُحفظ التفضيل محليًا ويُطبق فورًا.</small></section><section class="panel settings-scanner-card"><div class="panel__head"><div><span class="eyebrow">الماسح والكاميرا</span><h2>كاميرا مسح الباركود</h2></div></div><p>الكاميرا الحالية: <strong>${escapeHtml(cameraLabel)}</strong></p><div class="dialog__actions"><button class="button button--primary" data-action="select-camera">${msymbol("videocam", "text-[19px]")}<span>اختيار الكاميرا</span></button></div></section>${notificationsPanelMarkup()}${settingsContactMarkup()}</div>`;
 }
+
 
 function generalSettingsMarkup() {
   return `${topbarMarkup("إعدادات عامة", "حدّث بيانات المتجر التي تظهر في رأس التطبيق والفواتير، ثم احفظ التغيير.", settingsBackAction())}
@@ -2645,6 +2675,8 @@ async function handleActionUnsafe(event) {
   if (action === "test-notification") { const ok = await showAppNotification({ topic: "general", key: `test:${Date.now()}`, title: "إشعار تجريبي من حسابي", body: "إذا وصلك هذا الإشعار فالتنبيهات تعمل بشكل صحيح.", cooldownMs: 0 }); showToast(ok ? "أُرسل الإشعار التجريبي." : "تعذر الإرسال. تأكد من تفعيل الإشعارات.", ok ? "success" : "error"); return; }
   if (action === "reset-notification-history") { clearNotificationHistory(); showToast("أُعيد ضبط سجل التكرار. ستصلك التنبيهات من جديد."); void syncNotificationAlerts(); return; }
   if (action === "toggle-theme") { toggleTheme(); return; }
+  if (action === "set-theme") { setThemePreference(event.currentTarget.dataset.theme); return; }
+  if (action === "select-camera") { openCameraSelectDialog(); return; }
   if (action === "quick-lock") { openScreenLockDialog(); return; }
   if (action === "toggle-report-panel") { const key = event.currentTarget.dataset.panel; if (!state.reportPanels) state.reportPanels = {}; state.reportPanels[key] = !state.reportPanels[key]; renderKeepingScroll(); return; }
   if (action === "filter-activity-type") { state.activityType = event.currentTarget.dataset.type; render(); return; }
@@ -3591,6 +3623,17 @@ async function toggleTheme() {
   } catch (error) { showToast(error.message, "error"); }
 }
 
+async function setThemePreference(theme) {
+  try {
+    if (!THEME_MODES.includes(theme)) return;
+    await db.saveSettings({ ...state.settings, theme });
+    state.settings = await db.getSettings();
+    applyTheme();
+    render();
+    showToast(theme === "system" ? `يتبع ضبط الجهاز الآن (${systemPrefersDark() ? "داكن" : "فاتح"})` : theme === "dark" ? "تم تفعيل الوضع الداكن" : "تم تفعيل الوضع الفاتح");
+  } catch (error) { showToast(error.message, "error"); }
+}
+
 async function deleteAllProducts() { const count = state.products.length; if (!count) { showToast("لا توجد منتجات لحذفها."); return; } if (!window.confirm(`تنبيه: سيتم حذف ${count} منتجًا من قوائم المنتجات والمخزون. ستبقى الفواتير والسجلات المالية محفوظة. هل تريد المتابعة؟`)) return; if (!window.confirm("تأكيد نهائي: سيتم إخفاء جميع المنتجات الحالية من القوائم لتتمكن من استيراد قائمة جديدة. هل تؤكد الحذف؟")) return; try { const deleted = await db.softDeleteAllProducts(); state.cart = []; await refresh(); render(); showToast(`تم حذف ${deleted} منتجًا من القوائم مع الحفاظ على السجلات.`); } catch (error) { showToast(error.message || "تعذر حذف المنتجات.", "error"); } }
 
 function openHoldInvoiceDialog() {
@@ -4492,7 +4535,7 @@ async function startCameraScanner(overlay, onDetected, unsupportedMessage, manua
   content.querySelector("#manual-barcode-form")?.addEventListener("submit", (event) => { event.preventDefault(); findInternalCode(new FormData(event.currentTarget).get("internalCode"), manualMode, { keepScannerOpen: true }); });
   try {
     let stream;
-    try { stream = await navigator.mediaDevices.getUserMedia(getScannerCameraConstraints()); }
+    try { stream = await navigator.mediaDevices.getUserMedia(getScannerCameraConstraints(state.settings?.preferredCameraId || null)); }
     catch { stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }); }
     const video = content.querySelector("#scanner-video");
     video.srcObject = stream;
