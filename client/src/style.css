@@ -2199,3 +2199,26 @@ button.pd-mini { cursor:pointer; }
 .stitch-dialog .account-transaction { border-radius:12px; }
 .stitch-dialog .payment-receipt__highlight { border-radius:12px; }
 .stitch-dialog .payment-receipt__badge { border-radius:12px; }
+
+/* ===== Stitch cashbox (الدفعة 6) ===== */
+.cb-hero { padding:16px; margin:0 0 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:20px; box-shadow:0 12px 26px rgba(0,81,60,.22); }
+.cb-hero__value { display:grid; gap:2px; }
+.cb-hero__value span { font-size:11px; font-weight:700; opacity:.85; }
+.cb-hero__value strong { font-size:26px; font-variant-numeric:tabular-nums; }
+.cb-hero__value small { font-size:11px; font-weight:700; opacity:.85; }
+.cb-hero__minis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px; }
+.cb-mini { display:grid; gap:2px; padding:10px 8px; color:#fff; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.25); border-radius:14px; text-align:center; }
+.cb-mini span { font-size:9px; font-weight:700; opacity:.85; }
+.cb-mini strong { font-size:13px; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.cb-cta { display:flex; gap:8px; margin:0 0 12px; }
+.cb-cta .button { flex:1 1 0; min-height:52px; border-radius:14px; font-size:14px; }
+.cashbox-panels .report-toggle { background:var(--color-surface-container-lowest); border-color:var(--color-outline-variant); border-radius:16px; }
+.cashbox-panels .report-toggle__icon { width:40px; height:40px; color:var(--color-primary); background:var(--color-surface-container); border-radius:12px; }
+.cashbox-panels .report-toggle__badge { font-weight:800; }
+.cashbox-panels .report-card { background:var(--color-surface-container-lowest); border:1px solid var(--color-outline-variant); border-radius:16px; }
+.cashbox-panels .report-card > div strong { font-variant-numeric:tabular-nums; }
+.cashbox-panels .is-negative { color:var(--danger); }
+.cashbox-panels .is-positive { color:#187247; }
+[data-theme="dark"] .cashbox-panels .is-positive { color:#7bd8aa; }
+.stitch-dialog .cashier-shift-handover__received { border-radius:14px; }
+.stitch-dialog .cashier-shortage-deduction-preview { border-radius:14px; }
