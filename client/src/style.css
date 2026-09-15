@@ -2232,3 +2232,28 @@ button.pd-mini { cursor:pointer; }
 .expense-period-grid .entity-row__icon, .salary-expense-section .entity-row__icon { border-radius:12px; }
 .stitch-dialog .purchase-picker { border-radius:14px; }
 .stitch-dialog .purchase-line { border-radius:14px; }
+
+/* ===== Stitch reports (الدفعة 8) ===== */
+.smart-card__list { display:grid; }
+.smart-rank-row { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); }
+.smart-rank-row:last-child { border-bottom:0; }
+.rank-badge { display:grid; place-items:center; flex:0 0 auto; min-width:36px; height:36px; padding:0 8px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:11px; font-size:13px; font-weight:800; }
+.rank-badge--profit { background:linear-gradient(145deg,#b07c2a,#7a551b); }
+.rank-info { flex:1 1 auto; min-width:0; }
+.rank-info strong { display:block; font-size:12px; overflow-wrap:anywhere; }
+.rank-info small { display:block; margin-top:2px; color:var(--muted); font-size:10px; }
+.rank-value { white-space:nowrap; font-size:13px; }
+.text-success { color:#187247; }
+[data-theme="dark"] .text-success { color:#7bd8aa; }
+.peak-hour-badge { display:inline-block; padding:6px 12px; color:#fff; background:linear-gradient(145deg,#0a7a5c,#00513c); border-radius:999px; font-size:11px; font-weight:800; }
+.hourly-bars-chart { display:flex; align-items:stretch; gap:3px; height:158px; padding-top:8px; }
+.hourly-bar-col { flex:1 1 0; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:4px; min-width:0; }
+.hourly-bar-fill { width:100%; max-width:22px; background:rgba(10,122,92,.32); border-radius:6px 6px 3px 3px; }
+.hourly-bar-col.is-peak .hourly-bar-fill { background:linear-gradient(180deg,#0a7a5c,#00513c); }
+.hourly-bar-label { font-size:8px; color:var(--muted); white-space:nowrap; }
+.dead-stock-items-chips { display:flex; flex-wrap:wrap; gap:8px; }
+.dead-stock-chip { padding:8px 12px; color:var(--ink); background:var(--color-surface-container,#f4f6f1); border:1px solid var(--line); border-radius:999px; font-size:11px; font-weight:700; }
+.peak-hours-card, .dead-stock-card { border-radius:16px; }
+.periodic-inventory-row__icon { border-radius:11px; }
+.stitch-dialog .report-export-options .button { border-radius:14px; }
+.stitch-dialog .periodic-inventory-detail>div:not(.periodic-inventory-detail__comparison) { border-radius:12px; }
