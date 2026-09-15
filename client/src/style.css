@@ -173,7 +173,30 @@
 /* Stitch helpers: مناطق الأمان + أيقونات Material + الرأس العام اللاصق. */
 .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-.material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; user-select: none; }
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/material-symbols-outlined.woff2") format("woff2");
+}
+.material-symbols-outlined { font-family: "Material Symbols Outlined"; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr; -webkit-font-smoothing: antialiased; font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; user-select: none; }
+/* أحجام أيقونات Material (تعويض غياب Tailwind) + ألوانها */
+.material-symbols-outlined.text-\[13px\] { font-size:13px; }
+.material-symbols-outlined.text-\[14px\] { font-size:14px; }
+.material-symbols-outlined.text-\[15px\] { font-size:15px; }
+.material-symbols-outlined.text-\[16px\] { font-size:16px; }
+.material-symbols-outlined.text-\[17px\] { font-size:17px; }
+.material-symbols-outlined.text-\[18px\] { font-size:18px; }
+.material-symbols-outlined.text-\[19px\] { font-size:19px; }
+.material-symbols-outlined.text-\[20px\] { font-size:20px; }
+.material-symbols-outlined.text-\[22px\] { font-size:22px; }
+.material-symbols-outlined.text-\[24px\] { font-size:24px; }
+.material-symbols-outlined.text-\[26px\] { font-size:26px; }
+.material-symbols-outlined.text-\[28px\] { font-size:28px; }
+.material-symbols-outlined.text-\[30px\] { font-size:30px; }
+.material-symbols-outlined.text-primary { color:var(--color-primary); }
+.material-symbols-outlined.text-tertiary { color:var(--color-tertiary,var(--color-primary)); }
 .app-header { position: sticky; top: 0; z-index: 40; margin: -24px -16px 0; }
 @media (max-width: 599px) { .app-header { margin: -24px -12px 0; } }
 @media (min-width: 600px) { .app-header { margin: -32px -28px 0; } }

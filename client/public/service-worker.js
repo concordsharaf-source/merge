@@ -1,4 +1,4 @@
-const CACHE_NAME = "hesabi-pwa-v43"; // سجل الإصدارات: hesabi-pwa-v43 hesabi-pwa-v37 hesabi-pwa-v36 hesabi-pwa-v35 hesabi-pwa-v34 hesabi-pwa-v33 hesabi-pwa-v32 hesabi-pwa-v31 hesabi-pwa-v30 hesabi-pwa-v29 hesabi-pwa-v28 hesabi-pwa-v27 hesabi-pwa-v26 hesabi-pwa-v25 hesabi-pwa-v24 hesabi-pwa-v23 hesabi-pwa-v22 hesabi-pwa-v21
+const CACHE_NAME = "hesabi-pwa-v44"; // سجل الإصدارات: hesabi-pwa-v44 hesabi-pwa-v37 hesabi-pwa-v36 hesabi-pwa-v35 hesabi-pwa-v34 hesabi-pwa-v33 hesabi-pwa-v32 hesabi-pwa-v31 hesabi-pwa-v30 hesabi-pwa-v29 hesabi-pwa-v28 hesabi-pwa-v27 hesabi-pwa-v26 hesabi-pwa-v25 hesabi-pwa-v24 hesabi-pwa-v23 hesabi-pwa-v22 hesabi-pwa-v21
 const SCOPE_PATH = new URL(self.registration.scope).pathname;
 const APP_SHELL = [SCOPE_PATH, `${SCOPE_PATH}manifest.json`, `${SCOPE_PATH}service-worker.js`];
 const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
